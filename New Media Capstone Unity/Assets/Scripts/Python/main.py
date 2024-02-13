@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import UnityEngine as ue
 import cv2
 import depthai as dai
 from calc import HostSpatialsCalc
@@ -62,7 +62,6 @@ with dai.Device(pipeline) as device:
 
         # Get disparity frame for nicer depth visualization
         disp = dispQ.get().getFrame()
-        disp2 = disp
         disp = (disp * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
         disp = cv2.applyColorMap(disp, cv2.COLORMAP_JET)
         
@@ -88,7 +87,7 @@ with dai.Device(pipeline) as device:
 
 
         # Show the frame
-        #cv2.imshow(f"red mask", Red_mask)
+        cv2.imshow(f"red mask", Red_mask)
         cv2.imshow("result", result)
         cv2.imshow("disp", disp)
 
@@ -97,9 +96,9 @@ with dai.Device(pipeline) as device:
             break
         elif key == ord('w'):
             red_range += 1
-           # if red_range > 119:
-                #red_range = 119
-               # print(red_range)
+            if red_range > 119:
+                red_range = 119
+            print(red_range)
         elif key == ord('s'):
             red_range -= 1
             print(red_range)
