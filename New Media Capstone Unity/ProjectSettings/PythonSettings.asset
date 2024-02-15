@@ -5,7 +5,8 @@
         "m_Name": "",
         "m_EditorClassIdentifier": "",
         "m_sitePackages": [
-            "/PythonPackages/"
+            "/PythonPackages/",
+            "/Library/PythonInstall/Lib/site-packages"
         ]
     }
 }
