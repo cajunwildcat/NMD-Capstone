@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.Scripting.Python;
+using UnityEditor;
 
+[CustomEditor(typeof(PythonManager))]
 public class PythonManager : MonoBehaviour
 {
 	PythonManager instance;
