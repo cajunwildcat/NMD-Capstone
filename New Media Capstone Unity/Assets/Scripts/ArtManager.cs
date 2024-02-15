@@ -9,12 +9,13 @@ using UnityEngine;
 //Depending on how we are handling the dark area, we might also need a separate function to turn that off.
 public class ArtManager : MonoBehaviour
 {
-    public bool artSection1 = false;
-    public bool artSection2 = false;
-    public bool artSection3 = false;
-    public bool artSection4 = false;
-    public bool artSection5 = false;
-    public bool artSection6 = false;
+    // These variables will keep track of which sections are currently visible 
+    public bool artSection1visible = false;
+    public bool artSection2visible = false;
+    public bool artSection3visible = false;
+    public bool artSection4visible = false;
+    public bool artSection5visible = false;
+    public bool artSection6visible = false;
 
     // Assuming divisionSections is 6 for now.
     // This number is not really very changeable. Since we need to do the splitting manually.
@@ -40,6 +41,7 @@ public class ArtManager : MonoBehaviour
             return;
         }
 
+        //   
         // Toggle visibility
         bool isVisible = !artSections[section - 1].activeSelf;
         artSections[section - 1].SetActive(isVisible);
@@ -47,12 +49,12 @@ public class ArtManager : MonoBehaviour
         // Update the corresponding Boolean variable
         switch (section)
         {
-            case 1: artSection1 = isVisible; break;
-            case 2: artSection2 = isVisible; break;
-            case 3: artSection3 = isVisible; break;
-            case 4: artSection4 = isVisible; break;
-            case 5: artSection5 = isVisible; break;
-            case 6: artSection6 = isVisible; break;
+            case 1: artSection1visible = isVisible; break;
+            case 2: artSection2visible = isVisible; break;
+            case 3: artSection3visible = isVisible; break;
+            case 4: artSection4visible = isVisible; break;
+            case 5: artSection5visible = isVisible; break;
+            case 6: artSection6visible = isVisible; break;
         }
     }
 }
