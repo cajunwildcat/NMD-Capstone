@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,6 +30,41 @@ public class ArtManager : MonoBehaviour
         //Spawn and turn off display for sprites here.
     }
 
+    void Update()
+    {
+        // Check if the mouse button was clicked
+        if (Input.GetMouseButtonDown(0)) // 0 is for left button, 1 for right button, 2 for middle button
+        {
+            HandleMouseClick();
+        }
+    }
+
+    void HandleMouseClick()
+    {
+        // Convert mouse position to world position
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        // Assuming the camera is centered and the sprites cover the entire view equally
+        float screenWidth = Camera.main.orthographicSize * 2.0f * Camera.main.aspect;
+        float screenHeight = Camera.main.orthographicSize * 2.0f;
+
+        float spriteWidth = 1365f; // Sprite width
+        float spriteHeight = 1080f; // Sprite height
+
+        // Calculate single section dimensions based on your setup
+        float sectionWidth = screenWidth / 3; // 3 columns
+        float sectionHeight = screenHeight / 2; // 2 rows
+
+        // Calculate which section the click is in
+        int column = (int)((mousePos.x + screenWidth / 2) / sectionWidth) + 1;
+        int row = (int)((mousePos.y + screenHeight / 2) / sectionHeight) + 1;
+
+        int section = (row - 1) * 3 + column; // Calculate section based on row and column
+
+        // Call ShowArtSection for the calculated section
+        ShowArtSection(section);
+    }
+
     // I have a plan for making this section check all of the boolean variables and then set the correct ones to display.
     // Although I'm trying to find a more efficient way that would reduce the amount of things this function checks.
 
@@ -41,6 +77,32 @@ public class ArtManager : MonoBehaviour
             return;
         }
 
+        //Testing Section Console Logs
+        if (section == 1)
+        {
+            Debug.Log("Section 1 was Called");
+        }
+        else if (section == 2)
+        {
+            Debug.Log("Section 2 was Called");
+        }
+        else if (section == 3)
+        {
+            Debug.Log("Section 3 was Called");
+        }
+        else if (section == 4)
+        {
+            Debug.Log("Section 4 was Called");
+        }
+        else if (section == 5)
+        {
+            Debug.Log("Section 5 was Called");
+        }
+        else if (section == 6)
+        {
+            Debug.Log("Section 6 was Called");
+        }
+
         //   
         // Toggle visibility
         bool isVisible = !artSections[section - 1].activeSelf;
@@ -49,12 +111,20 @@ public class ArtManager : MonoBehaviour
         // Update the corresponding Boolean variable
         switch (section)
         {
-            case 1: artSection1visible = isVisible; break;
-            case 2: artSection2visible = isVisible; break;
-            case 3: artSection3visible = isVisible; break;
-            case 4: artSection4visible = isVisible; break;
-            case 5: artSection5visible = isVisible; break;
-            case 6: artSection6visible = isVisible; break;
+            case 1: break;
+            case 2: break;
+            case 3: break;
+            case 4: break;
+            case 5: break;
+            case 6: break;
+                /*
+                case 1: artSection1visible = isVisible; break;
+                case 2: artSection2visible = isVisible; break;
+                case 3: artSection3visible = isVisible; break;
+                case 4: artSection4visible = isVisible; break;
+                case 5: artSection5visible = isVisible; break;
+                case 6: artSection6visible = isVisible; break;
+                */
         }
     }
 }
