@@ -78,53 +78,24 @@ public class ArtManager : MonoBehaviour
         }
 
         //Testing Section Console Logs
-        if (section == 1)
-        {
-            Debug.Log("Section 1 was Called");
-        }
-        else if (section == 2)
-        {
-            Debug.Log("Section 2 was Called");
-        }
-        else if (section == 3)
-        {
-            Debug.Log("Section 3 was Called");
-        }
-        else if (section == 4)
-        {
-            Debug.Log("Section 4 was Called");
-        }
-        else if (section == 5)
-        {
-            Debug.Log("Section 5 was Called");
-        }
-        else if (section == 6)
-        {
-            Debug.Log("Section 6 was Called");
-        }
+        Debug.Log($"Section {section} was Called");
 
-        //   
         // Toggle visibility
-        bool isVisible = !artSections[section - 1].activeSelf;
-        artSections[section - 1].SetActive(isVisible);
+        bool isVisible = !artSections[section - 1].GetComponent<SpriteRenderer>().enabled;
+        artSections[section - 1].GetComponent<SpriteRenderer>().enabled = isVisible;
 
         // Update the corresponding Boolean variable
         switch (section)
         {
-            case 1: break;
-            case 2: break;
-            case 3: break;
-            case 4: break;
-            case 5: break;
-            case 6: break;
-                /*
-                case 1: artSection1visible = isVisible; break;
-                case 2: artSection2visible = isVisible; break;
-                case 3: artSection3visible = isVisible; break;
-                case 4: artSection4visible = isVisible; break;
-                case 5: artSection5visible = isVisible; break;
-                case 6: artSection6visible = isVisible; break;
-                */
+            case 1: artSection1visible = isVisible; break;
+            case 2: artSection2visible = isVisible; break;
+            case 3: artSection3visible = isVisible; break;
+            case 4: artSection4visible = isVisible; break;
+            case 5: artSection5visible = isVisible; break;
+            case 6: artSection6visible = isVisible; break;
         }
     }
+
+
+
 }
