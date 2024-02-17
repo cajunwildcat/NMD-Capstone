@@ -1,6 +1,6 @@
-opencv-python
+opencv-python==4.9.0.80
 depthai==2.16.0.0
-numpy
-PySide2
-shiboken2
-setuptools
+numpy==1.26.4
+PySide2==5.15.2.1
+shiboken2==5.15.2.1
+setuptools==63.2.0

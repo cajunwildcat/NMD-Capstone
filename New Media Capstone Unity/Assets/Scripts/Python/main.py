@@ -130,6 +130,9 @@ xoutDepth = pipeline.create(dai.node.XLinkOut)
 xoutDepth.setStreamName("disp")
 stereo.disparity.link(xoutDepth.input)
 
+
+
+
 # Connect to device and start pipeline
 with dai.Device(pipeline) as device:
     # Output queue will be used to get the depth frames from the outputs defined above
