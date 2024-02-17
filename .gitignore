@@ -47,6 +47,26 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+#ignore Python virtual environment
+venv/
+.venv/
+
+#ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+#ignore jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+#ignore the directory where globally installed packages may reside
+site-packages/
+
+#ignore OS generated files
+.DS_Store
+Thumbs.db 
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta

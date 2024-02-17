@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HiddenObject : MonoBehaviour {
-    BoxCollider2D collider;
+    new BoxCollider2D collider; //new is placed here for intentional replacement or not planning on using inheritance (to update code in future)
     [SerializeField] Material unlitSprite;
     SpriteRenderer progressSprite;
 

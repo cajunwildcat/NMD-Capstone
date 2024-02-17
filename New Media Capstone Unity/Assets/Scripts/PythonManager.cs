@@ -2,7 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.Scripting.Python;
+using UnityEditor;
 
+//code here is designed to function as a regular component that can be attached to GameObjects; not as an Editor Extension
+
+
+// [CustomEditor(typeof(PythonManager))]
 public class PythonManager : MonoBehaviour
 {
 	PythonManager instance;
