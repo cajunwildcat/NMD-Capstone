@@ -7,7 +7,13 @@ using UnityEngine;
 
 public class PythonMainTestRun : MonoBehaviour
 {
-    public string scriptPath = Application.dataPath +  "/Scripts/Python/main.py";
+    public string scriptPath;
+
+    private void Awake()
+    {
+        scriptPath = Application.dataPath + "/Scripts/Python/main.py";
+    }
+
 
     void OnMouseDown()
     {

@@ -5,7 +5,7 @@
         "m_Name": "",
         "m_EditorClassIdentifier": "",
         "m_sitePackages": [
-            "/PythonPackages/"
+            "C:\\\\Program Files\\\\Python310\\\\lib\\\\site-packages"
         ]
     }
 }
