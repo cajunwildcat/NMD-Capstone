@@ -39,14 +39,17 @@ public class MeasureDepth : MonoBehaviour
 
     private KinectSensor sensor = null;
     private CoordinateMapper mapper = null; //measure depth data onto color points;there is an offset -- need compensation
+    private Camera testCamera = null;
 
 
     private readonly Vector2Int depthResolution = new Vector2Int(512, 424); //depth sensor creates image by this pixelation
+    private Rect testRect;
 
     private void Awake()
     {
         sensor = KinectSensor.GetDefault();
         mapper = sensor.CoordinateMapper;
+        testCamera = Camera.main;
 
         //initialize arrays -- find out how much data is necessary in 2D space by multiplying 512 by 424
         int arraySize = depthResolution.x * depthResolution.y;
@@ -62,8 +65,16 @@ public class MeasureDepth : MonoBehaviour
         {
             //getting that data and pass through texture function
             validPoints = DepthToColor();
+
+            testRect = CreateRect(validPoints);
+
             depthTexture = CreateTexture(validPoints);
         }
+    }
+
+    private void OnGUI()
+    {
+        GUI.Box(testRect, "");
     }
 
     //taking cam/color space points and lining them up
@@ -144,11 +155,20 @@ public class MeasureDepth : MonoBehaviour
         Vector2 bottomRight = GetBottomRight(points);
 
 
-        //translate to viewport
+        //translate to viewport -- gets all points from depthtocolor method
+        //if points; what top most left point and bottom most right aer
+        Vector2 screenTopLeft = ScreenToCamera(topLeft);
+        Vector2 screenBottomRight = ScreenToCamera(bottomRight);
 
+        //rect dimensions
+        int width = (int)(screenBottomRight.x - screenTopLeft.x);
+        int height = (int)(screenBottomRight.y - screenTopLeft.y);
 
+        //Create
+        Vector2 size = new Vector2(width, height);
+        Rect rect = new Rect(screenTopLeft, size);
 
-        return new Rect();
+        return rect;
     }
 
     private Vector2 GetTopLeft(List<ValidPoint> points)
@@ -180,6 +200,17 @@ public class MeasureDepth : MonoBehaviour
         }
 
         return bottomRight;
+    }
+
+    //converts two points topLeft, bottomRight and gives location on screen (correct drawing of rectangle
+    private Vector2 ScreenToCamera(Vector2 screenPosition)
+    {
+        Vector2 normalizedScreenPoint = new Vector2(Mathf.InverseLerp(0, 1920, screenPosition.x), Mathf.InverseLerp(0, 1080, screenPosition.y));
+
+        //convert back to pixel position
+        Vector2 screenPoint = new Vector2(normalizedScreenPoint.x * testCamera.pixelWidth, normalizedScreenPoint.y * testCamera.pixelHeight);
+
+        return screenPoint;
     }
 
 
