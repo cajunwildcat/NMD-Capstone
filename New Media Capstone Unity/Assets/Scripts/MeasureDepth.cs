@@ -13,6 +13,8 @@ public class MeasureDepth : MonoBehaviour
     public Texture2D depthTexture;
     //Cutoffs
     [Range(0, 1.0f)]
+
+    //depth senesitivity also means that objects may need to be closer to pick up recognition
     public float depthSensitivity = 1; //location of points at certain depth (used for detection)
     [Range(-10, 10f)]
     public float wallDepth = -10; //figure out how far something is from a wall (for detection)
@@ -35,6 +37,7 @@ public class MeasureDepth : MonoBehaviour
     private ColorSpacePoint[] colorSpacePoints = null;
     private ushort[] depthData = null; //multisource manager outputs depth data as a ushort[], store data here.
     private List<ValidPoint> validPoints = null;
+    private List<Vector2> triggerPoints = null;
     //need to know how much data is necessary for this (allocation of space)
 
     private KinectSensor sensor = null;
@@ -61,10 +64,14 @@ public class MeasureDepth : MonoBehaviour
 
     private void Update()
     {
+        
+        validPoints = DepthToColor();//getting that data and pass through texture function
+
+        triggerPoints = FilterToTrigger(validPoints);
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            //getting that data and pass through texture function
-            validPoints = DepthToColor();
+            
+            
 
             testRect = CreateRect(validPoints);
 
@@ -75,6 +82,15 @@ public class MeasureDepth : MonoBehaviour
     private void OnGUI()
     {
         GUI.Box(testRect, "");
+        if(triggerPoints == null)
+        {
+            return;
+        }
+        foreach(Vector2 point in triggerPoints)
+        {
+            Rect rect = new Rect(point, new Vector2(10, 10));
+            GUI.Box(rect, "");
+        }
     }
 
     //taking cam/color space points and lining them up
@@ -120,6 +136,25 @@ public class MeasureDepth : MonoBehaviour
 
         return validPoints;
 
+    }
+
+    private List<Vector2> FilterToTrigger(List<ValidPoint> validPoints)
+    {
+        List<Vector2> triggerPoints = new List<Vector2>();
+        foreach(ValidPoint point in validPoints) //distilling down valid points
+        {
+            if (!point.withinWallDepth)
+            {
+                //valid points beinga all points in rect that is designated
+                if (point.z < wallDepth * depthSensitivity)
+                {
+                    //space looking for points
+                    Vector2 screenPoint = ScreenToCamera(new Vector2(point.colorSpace.X, point.colorSpace.Y));
+                    triggerPoints.Add(screenPoint);
+                }
+            }
+        }
+        return triggerPoints;
     }
 
 
