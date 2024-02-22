@@ -4,6 +4,12 @@
         "m_EditorHideFlags": 0,
         "m_Name": "",
         "m_EditorClassIdentifier": "",
+<<<<<<< HEAD
+        "m_sitePackages": [
+            "/Library/PythonInstall/Lib/site-packages"
+        ]
+=======
         "m_sitePackages": ["/Library/PythonInstall/Lib/site-packages"]
+>>>>>>> 1f386cecc775fab1600e0c0557eb3ecd9a2144b1
     }
 }
