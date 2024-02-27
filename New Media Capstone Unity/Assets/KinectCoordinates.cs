@@ -32,6 +32,8 @@ public class KinectCoordinates : MonoBehaviour {
         transform.position = pos;
     }
 
+    Vector2 kinectDepth = new Vector2(1.2f, 4f);
+
     private void BodyFrameArrived(object sender, BodyFrameArrivedEventArgs args, int sensorIndex) {
         using (var bodyFrame = args.FrameReference.AcquireFrame()) {
             if (bodyFrame == null) {
@@ -48,9 +50,12 @@ public class KinectCoordinates : MonoBehaviour {
 
                     // Output coordinates to console
                     float x = Mathf.Lerp(min.x, max.x, (position.X + 1) / 2);
-                    float y = Mathf.Lerp(min.y, max.y, position.Z / 4);
+                    //float y = Mathf.Lerp(min.y, max.y, position.Z);
+                    float l = position.Z;
+                    float t = (l-kinectDepth.y)/(kinectDepth.x -  kinectDepth.y);
+                    float y = Mathf.Lerp(min.y, max.y, t);
                     Debug.Log($"X: {x}, Y: {y}");
-                    pos = new Vector3(x + 900, y+ 450, 0);
+                    pos = new Vector3(x, y, 0);
                 }
             }
         }
