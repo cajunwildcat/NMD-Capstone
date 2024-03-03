@@ -16,6 +16,8 @@ The images will appear and have various animations depending on the New Media De
 
 ### Links to Plugins
 [Kinect for Windows SDK](https://learn.microsoft.com/en-us/windows/apps/design/devices/kinect-for-windows)
+
+Unity Pro Packages is the add-on we are using for this project.
 ![Screenshot of the Unity Packages location for linking Kinect One and Unity](/Resources/UnityPackages.png)
 
 ### Pre-Setup (Kinect Studio)
