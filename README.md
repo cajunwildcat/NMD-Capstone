@@ -4,9 +4,14 @@ The objective of this project is to create an experience that involves projectio
 
 By mapping a scene into the real world, we create an interactive environment where users are picked up by the Kinect. Then given a marker that determines their position in relation to the scene in Unity (hence, projection mapping). 
 
-The images will appear and have various animations depending on the New Media Designer.
+The images will appear and have various animations depending on the New Media Designer. The image is projected towards the ceiling in this current version of the project.
 
-# Instructions
+# Necessities
+- Projector for Unity scene and Xbox One Kinect
+- Laptop/PC to host Unity scene
+- Open Space of at least 15 x 15 feet for the projection.
+
+# Tech
 
 ### Versions / Tech
 - Unity version *must* be 2020.3.23f1(64-bit)
@@ -24,16 +29,27 @@ Unity Pro Packages is the add-on we are using for this project. This was importe
 
 ### If facing an error with Unity Pro packages...
 - Unity Pro packages must be downloaded for Unity.
-- Here is a link as a tutorial for setup on your home machine... [Tutorial](https://www.youtube.com/watch?v=6EkQA3GakFI&t=99s)
+- Here is a link as a tutorial for setup on your home machine... [YouTube Tutorial](https://www.youtube.com/watch?v=6EkQA3GakFI&t=99s)
 
-### Pre-Setup (Kinect Studio)
+
+# Instructions
+
+
+### Setup (Unity)
+1. Download the GitHub repo by doing a `git clone <httpsWebURL>` in your selected folder.
+2. Locate the `/Scenes` Directory
+
+### Setup (Projector)
+1. Ensure projector is aimed towards the ceiling
+2. Plug your projector into outlet and pc
+
+### Setup (Kinect Studio)
 1. Ensure you have a Xbox One Kinect w/USB adapater
 2. Plug the Xbox One Kinect into your PC
 3. Start Kinect Studio V2.0 on your Windows Machine
 4. On the top-left there will be a connect button. Press that to connect your Kinect.
 
-### Setup
-1. Download the GitHub repo by doing a `git clone <httpsWebURL>` in your selected folder.
-2. Locate the `/Scenes` Directory
+### Setup (Unity) ...continued
 3. Open `HiddenObjectTest.unity` file
 4. Run the file by pressing the 'play' button. 
+5. As long as the Kinect Studio V2.0 is running, the the scene will play.
