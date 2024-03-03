@@ -9,11 +9,13 @@ The images will appear and have various animations depending on the New Media De
 # Instructions
 
 ### Versions / Tech
-- UnityHub version *must* be 2020.3.23f1(64-bit)
+- Unity version *must* be 2020.3.23f1(64-bit)
 - Microsoft Windows 10 (current OS we are using)
 - Kinect for Windows SDK 2.0 *must* be downloaded and installed
 
 ### Links to Plugins
+[Unity Archive](https://unity.com/releases/editor/archive)
+
 [Kinect for Windows SDK](https://learn.microsoft.com/en-us/windows/apps/design/devices/kinect-for-windows)
 
 Unity Pro Packages is the add-on we are using for this project. This was imported into the Unity Project from our end, so there should not be any need to download this Unity Package.
