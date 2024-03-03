@@ -12,13 +12,17 @@ The images will appear and have various animations depending on the New Media De
 - UnityHub version *must* be 2020.3.23f1(64-bit)
 - Microsoft Windows 10 (current OS we are using)
 - Kinect for Windows SDK 2.0 *must* be downloaded and installed
-- 
 
 ### Links to Plugins
 [Kinect for Windows SDK](https://learn.microsoft.com/en-us/windows/apps/design/devices/kinect-for-windows)
 
-Unity Pro Packages is the add-on we are using for this project.
+Unity Pro Packages is the add-on we are using for this project. This was imported into the Unity Project from our end, so there should not be any need to download this Unity Package.
+
 ![Screenshot of the Unity Packages location for linking Kinect One and Unity](/Resources/UnityPackages.png)
+
+### If facing an error with Unity Pro packages...
+- Unity Pro packages must be downloaded for Unity.
+- Here is a link as a tutorial for setup on your home machine... [Tutorial](https://www.youtube.com/watch?v=6EkQA3GakFI&t=99s)
 
 ### Pre-Setup (Kinect Studio)
 1. Ensure you have a Xbox One Kinect w/USB adapater
@@ -29,4 +33,5 @@ Unity Pro Packages is the add-on we are using for this project.
 ### Setup
 1. Download the GitHub repo by doing a `git clone <httpsWebURL>` in your selected folder.
 2. Locate the `/Scenes` Directory
-3. Open `HiddenObjectTest.unity` file.
+3. Open `HiddenObjectTest.unity` file
+4. Run the file by pressing the 'play' button. 
