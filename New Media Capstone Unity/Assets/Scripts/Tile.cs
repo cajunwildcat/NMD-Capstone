@@ -9,8 +9,6 @@ public class Tile : MonoBehaviour {
     bool activated = false;
 
     [SerializeField] LayerMask searcherLayer;
-
-    bool found = false;
     // Start is called before the first frame update
     void Start() {
         collider = GetComponent<BoxCollider2D>();

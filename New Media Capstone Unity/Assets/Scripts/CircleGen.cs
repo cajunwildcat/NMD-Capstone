@@ -3,13 +3,15 @@ using UnityEngine;
 using System.Linq;
 
 public class CircleGen : MonoBehaviour {
-    float minRadius = 0.5f;
-    float maxRadius = 2;
-    int circleCount = 70;
+    float minRadius = 0.2f;
+    float maxRadius = 2.5f;
+    int circleCount = 100;
     public CircleTile circlePrefab;
-    int iterationCount = 5;
     public List<CircleTile> sCircles = new List<CircleTile>();
-    Bounds b;
+
+    [Range(0.001f, 0.1f)]
+    public float dampening = 0.0174f;
+    public float radiusAdjust = 0.31f;
 
     public void Start() {
     List<CircleTile> circles = new List<CircleTile>();
@@ -26,11 +28,10 @@ public class CircleGen : MonoBehaviour {
                             orderby c.Radius descending
                             select c;
         sCircles = sortedCircles.ToList();
-        b = GetComponent<SpriteRenderer>().bounds;
     }
 
     public void Update() {
-        if (Time.realtimeSinceStartup > 10f) return;
+        if (Time.realtimeSinceStartup > 15f) return;
         Vector2 v;
 
         foreach (CircleTile c1 in sCircles) {
@@ -39,12 +40,12 @@ public class CircleGen : MonoBehaviour {
                 //Debug.Log($"Comparing {c1.name} and {c2.name}");
                 float dx = c2.transform.position.x - c1.transform.position.x;
                 float dy = c2.transform.position.y - c1.transform.position.y;
-                float r = c1.Radius + c2.Radius;
+                float r = c1.Radius * 0.88f + c2.Radius * 0.88f;
                 float d = (dx * dx) + (dy * dy);
                 if (d < (r * r) - 0.001) {
                     v = new Vector3(dx, dy);
                     v.Normalize();
-                    v *= (float)((r - (float)Mathf.Sqrt(d)) * 0.5f);
+                    v *= (float)((r - (float)Mathf.Sqrt(d)) * radiusAdjust);
 
                     //Debug.Log($"Adjusting positions by {v}");
                     c2.transform.Translate(v);
@@ -53,7 +54,6 @@ public class CircleGen : MonoBehaviour {
             }
         }
 
-        float dampening = 0.1f / (float)iterationCount;
         foreach (CircleTile c in sCircles) {
             v = c.transform.position - transform.position;
             v *= dampening;
