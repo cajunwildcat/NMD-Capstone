@@ -12,6 +12,8 @@ public class CircleTile : MonoBehaviour {
     public float Radius;
     [SerializeField] LayerMask searcherLayer;
     bool prevHit = false;
+    float circleAnimLength = 2.2f;
+    bool animating = false;
 
     // Start is called before the first frame update
     void Start() {
@@ -26,10 +28,9 @@ public class CircleTile : MonoBehaviour {
         if (sm.sprite != sr.sprite) {
             sm.sprite = sr.sprite;
         }
-        RaycastHit2D hit = Physics2D.CircleCast(transform.position, collider.radius, Vector2.zero, 0, searcherLayer);
+        RaycastHit2D hit = Physics2D.CircleCast(transform.position, collider.radius * transform.localScale.x, Vector2.zero, 0, searcherLayer);
         if (!activated && hit) {
-            anim.SetTrigger("Reveal");
-            sm.enabled = activated = true;
+            Activate();
         }
         if (activated && !hit && prevHit) {
             StartCoroutine(TimeOut(3f));
@@ -38,12 +39,28 @@ public class CircleTile : MonoBehaviour {
     }
 
     IEnumerator TimeOut(float t) {
+        new WaitUntil(() => !animating);
         yield return new WaitForSeconds(t);
-        anim.SetTrigger("FadeOut");
-        anim.ResetTrigger("Reveal");
+        RaycastHit2D hit = Physics2D.CircleCast(transform.position, collider.radius * transform.localScale.x, Vector2.zero, 0, searcherLayer);
+        if (hit) yield break;
+        anim.SetBool("Reveal", false);
+        sm.enabled = activated = false;
         yield return new WaitForSeconds(1);
         anim.ResetTrigger("FadeOut");
-        sm.enabled = activated = false;
-        sm.material.color = Color.white;
+    }
+
+    IEnumerator WaitFor(Action action, float time) {
+        yield return new WaitForSeconds(time);
+        action();
+    }
+
+    public void Activate() {
+        StopAllCoroutines();
+        anim.SetBool("Reveal", true);
+        sm.sprite = sr.sprite;
+        sm.enabled = activated = animating = true;
+        StartCoroutine(WaitFor(() => {
+            animating = false;
+        }, circleAnimLength));
     }
 }

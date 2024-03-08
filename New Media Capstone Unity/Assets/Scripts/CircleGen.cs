@@ -3,11 +3,15 @@ using UnityEngine;
 using System.Linq;
 
 public class CircleGen : MonoBehaviour {
+    static CircleGen instance;
+    public static CircleGen Instance => instance;
+
     float minRadius = 0.2f;
     float maxRadius = 2.5f;
     int circleCount = 100;
     public CircleTile circlePrefab;
     public List<CircleTile> sCircles = new List<CircleTile>();
+    public List<CircleTile> SortedCircles => sCircles;
 
     [Range(0.001f, 0.1f)]
     public float dampening = 0.0174f;
@@ -31,7 +35,7 @@ public class CircleGen : MonoBehaviour {
     }
 
     public void Update() {
-        if (Time.realtimeSinceStartup > 15f) return;
+        //if (Time.realtimeSinceStartup > 15f) return;
         Vector2 v;
 
         foreach (CircleTile c1 in sCircles) {
@@ -40,7 +44,7 @@ public class CircleGen : MonoBehaviour {
                 //Debug.Log($"Comparing {c1.name} and {c2.name}");
                 float dx = c2.transform.position.x - c1.transform.position.x;
                 float dy = c2.transform.position.y - c1.transform.position.y;
-                float r = c1.Radius * 0.88f + c2.Radius * 0.88f;
+                float r = c1.GetComponent<CircleTile>().Radius * 0.88f + c2.GetComponent<CircleTile>().Radius * 0.88f;
                 float d = (dx * dx) + (dy * dy);
                 if (d < (r * r) - 0.001) {
                     v = new Vector3(dx, dy);
