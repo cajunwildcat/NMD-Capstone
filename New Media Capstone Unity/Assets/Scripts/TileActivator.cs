@@ -19,6 +19,9 @@ public class TileActivator : MonoBehaviour {
                 case "CircleTile":
                     gm.GetComponent<CircleTile>().Activate();
                     break;
+                case "CubeTile":
+                    gm.GetComponent<ColumnTile>().Activate();
+                    break;
             }
         }
     }
