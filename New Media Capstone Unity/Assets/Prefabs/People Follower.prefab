@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1596959009043264443}
   - component: {fileID: 5788584422523801908}
   - component: {fileID: 3051726858858100851}
+  - component: {fileID: -3883179690619866019}
   m_Layer: 7
   m_Name: People Follower
   m_TagString: PeopleFollower
@@ -99,3 +100,15 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &-3883179690619866019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 343499153897624774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1988f53a4f5d994c84a596bbbcfd8f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

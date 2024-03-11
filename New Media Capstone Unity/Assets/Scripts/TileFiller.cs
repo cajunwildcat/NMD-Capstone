@@ -15,7 +15,7 @@ public class TileFiller : MonoBehaviour {
         Bounds bounds = background.bounds;
         float totalWidth = bounds.size.x;
         float totalHeight = bounds.size.y;
-        Debug.Log(bounds.min);
+        //Debug.Log(bounds.min);
         float tileWidth = totalWidth / TileCols;
         float tileHeight = totalHeight / TileRows;
 

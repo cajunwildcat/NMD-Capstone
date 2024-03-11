@@ -6,6 +6,8 @@ TagManager:
   tags:
   - PeopleFollower
   - SVG Tile
+  - CircleTile
+  - RectTile
   layers:
   - Default
   - TransparentFX
