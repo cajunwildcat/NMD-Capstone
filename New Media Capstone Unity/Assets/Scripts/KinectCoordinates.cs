@@ -17,18 +17,22 @@ public class KinectCoordinates : MonoBehaviour {
     public float trackerScale = 1f;
 
     void Start() {
-        sensor = KinectSensor.GetDefault();
-        bodyFrameReaders = sensor.BodyFrameSource.OpenReader();
+        sensor = KinectSensor.GetDefault(); //gets the Kinect Sensor connected to current PC. only one allowed per PC
+        bodyFrameReaders = sensor.BodyFrameSource.OpenReader(); //reads the body frame picked up by the Kinect
 
-        bodyFrameReaders.FrameArrived += (sender, args) => BodyFrameArrived(sender, args);
-
+        // lambda function that calls BodyFrameArrived method
+        //actively sends over the data to determine position.
+        bodyFrameReaders.FrameArrived += (sender, args) => BodyFrameArrived(sender, args); 
+        //sensor must be set to open to operate
         sensor.Open();
     }
 
+    //sensor must be unsubscribed from closing the scene / stopping the play
     void OnDestroy() {
         sensor.Close();
     }
 
+    //update user position
     private void Update() {
         transform.position = pos;
     }
