@@ -52,6 +52,6 @@ Unity Pro Packages is the add-on we are using for this project. This was importe
 5. Video will start upon pressing the button and show what the Kinect sees.
 
 ### Setup (Unity) ...continued
-3. Open `HiddenObjectTest.unity` file
+3. Open `Circles2.unity` file
 4. Run the file by pressing the 'play' button. 
 5. As long as the Kinect Studio V2.0 is running, the the scene will play.
