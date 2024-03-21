@@ -25,7 +25,7 @@ public class CircleTile : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (sm.sprite != sr.sprite) {
+        if (animating && sm.sprite != sr.sprite) {
             sm.sprite = sr.sprite;
         }
         RaycastHit2D hit = Physics2D.CircleCast(transform.position, collider.radius * transform.localScale.x, Vector2.zero, 0, searcherLayer);
@@ -44,9 +44,8 @@ public class CircleTile : MonoBehaviour {
         RaycastHit2D hit = Physics2D.CircleCast(transform.position, collider.radius * transform.localScale.x, Vector2.zero, 0, searcherLayer);
         if (hit) yield break;
         anim.SetBool("Reveal", false);
-        sm.enabled = activated = false;
         yield return new WaitForSeconds(1);
-        anim.ResetTrigger("FadeOut");
+        sm.enabled = activated = false;
     }
 
     IEnumerator WaitFor(Action action, float time) {

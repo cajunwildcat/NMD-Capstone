@@ -8,6 +8,7 @@ TagManager:
   - SVG Tile
   - CircleTile
   - RectTile
+  - CubeTile
   layers:
   - Default
   - TransparentFX

@@ -14,7 +14,20 @@ public class KinectCoordinates : MonoBehaviour {
     private Vector3 pos;
 
     public bool switchXZ = false;
+    public bool flipLong = false;
+    public bool flipShort = false;
     public float trackerScale = 1f;
+    public Vector2 kinectDepthCutOffs = new Vector2(0f, 5f);
+    float kinectXOffset;
+
+    bool setNextZero = false;
+    bool setNextDepthMin = false;
+    bool setNextDepthMax = false;
+
+    private void OnDrawGizmos() {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(max+min, new Vector3(Mathf.Abs(min.x) + Mathf.Abs(max.x), Mathf.Abs(min.y) + Mathf.Abs(max.y)));
+    }
 
     void Start() {
         sensor = KinectSensor.GetDefault(); //gets the Kinect Sensor connected to current PC. only one allowed per PC
@@ -25,6 +38,17 @@ public class KinectCoordinates : MonoBehaviour {
         bodyFrameReaders.FrameArrived += (sender, args) => BodyFrameArrived(sender, args); 
         //sensor must be set to open to operate
         sensor.Open();
+        
+        if (flipLong) {
+            float temp = min.x;
+            min.x = max.x;
+            max.x = temp;
+        }
+        if (flipShort) {
+            float temp = min.y;
+            min.y = max.y;
+            max.y = temp;
+        }
     }
 
     //sensor must be unsubscribed from closing the scene / stopping the play
@@ -35,36 +59,28 @@ public class KinectCoordinates : MonoBehaviour {
     //update user position
     private void Update() {
         transform.position = pos;
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            SetXZero();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            SetKinectMin();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            SetKinectMax();
+        }
     }
 
-    Vector2 kinectDepth = new Vector2(1.2f, 4f);
+    private void SetXZero() {
+        setNextZero = true;
+    }
 
-    /*private void BodyFrameArrived(object sender, BodyFrameArrivedEventArgs args) {
-        using (var bodyFrame = args.FrameReference.AcquireFrame()) {
-            if (bodyFrame == null) {
-                return;
-            }
+    private void SetKinectMin() {
+        setNextDepthMin = true;
+    }
 
-            Body[] bodies = new Body[sensors.BodyFrameSource.BodyCount];
-            bodyFrame.GetAndRefreshBodyData(bodies);
-
-            foreach (var body in bodies) {
-                if (body.IsTracked) {
-                    // Get top-down coordinates of the tracked body
-                    CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
-
-                    // Output coordinates to console
-                    float x = Mathf.Lerp(min.x, max.x, (position.X + 1) / 2);
-                    //float y = Mathf.Lerp(min.y, max.y, position.Z);
-                    float l = position.Z;
-                    float t = (l-kinectDepth.y)/(kinectDepth.x -  kinectDepth.y);
-                    float y = Mathf.Lerp(min.y, max.y, t);
-                    //Debug.Log($"X: {x}, Y: {y}");
-                    pos = new Vector3(x, y, 0);
-                }
-            }
-        }
-    }*/
+    private void SetKinectMax() {
+        setNextDepthMax = true;
+    }
 
     // Define a dictionary to keep track of the GameObjects associated with each TrackingId
     Dictionary<ulong, GameObject> trackedPeople = new Dictionary<ulong, GameObject>();
@@ -95,18 +111,45 @@ public class KinectCoordinates : MonoBehaviour {
                     GameObject personObject = trackedPeople[trackingId];
 
                     // Get top-down coordinates of the tracked body
-                    CameraSpacePoint cameraPosition = body.Joints[JointType.SpineMid].Position;
-                    Vector3 position;
-                    if (switchXZ) position = new Vector3(cameraPosition.Z, cameraPosition.X, 0);
-                    else position = new Vector3(cameraPosition.X, cameraPosition.Z, 0);
+                    CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
+
+                    if (setNextZero) {
+                        kinectXOffset = position.X * -1;
+                        transform.GetChild(0).gameObject.SetActive(false);
+                        setNextZero = false;
+                    }
+                    if (setNextDepthMin) {
+                        kinectDepthCutOffs.x = position.Z;
+                        setNextDepthMin = false;
+                    }
+                    if (setNextDepthMax) {
+                        kinectDepthCutOffs.y = position.Z;
+                        setNextDepthMax = false;
+                    }
+
+                    position.X += kinectXOffset;
+
+                    //Debug.Log(position);
 
                     // Calculate the position in Unity coordinates
-                    float x = Mathf.Lerp(min.x, max.x, (position.x + 1) / 2);
-                    float l = position.z;
-                    float t = (l - kinectDepth.y) / (kinectDepth.x - kinectDepth.y);
-                    float y = Mathf.Lerp(min.y, max.y, t);
+                    float x, y;
+                    if (switchXZ) {
+                        y = Mathf.Lerp(min.y, max.y, (position.X + 1) / 2);
+                        float l = position.Z;
+                        float t;
+                        if (l == kinectDepthCutOffs.x) t = 0;
+                        else t = (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
+                        x = Mathf.Lerp(min.x, max.x, t);
+                    }
+                    else {
+                        x = Mathf.Lerp(min.x, max.x, (position.X + 1) / 2);
+                        float l = position.Z;
+                        float t = (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
+                        y = Mathf.Lerp(min.y, max.y, t);
+                    }
 
                     // Update the position of the personObject
+
                     personObject.transform.position = new Vector3(x, y, 0);
                 }
             }
