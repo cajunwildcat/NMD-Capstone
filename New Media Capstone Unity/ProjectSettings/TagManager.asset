@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Tracker
+  - WhiteCloud
+  - YellowCloud
   layers:
   - Default
   - TransparentFX

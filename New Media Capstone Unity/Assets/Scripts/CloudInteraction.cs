@@ -15,7 +15,7 @@ public class CloudInteraction : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         // Check if the collider is the Tracker
-        if (other.CompareTag("Tracker"))
+        if (other.CompareTag("Tracker") && this.CompareTag("WhiteCloud"))
         {
             // Play the "Cloud Whoosh" sound effect
             audioSource.Play();
@@ -23,5 +23,15 @@ public class CloudInteraction : MonoBehaviour
             // Trigger the fade away animation
             animator.SetTrigger("Disappear1");
         }
+
+        if (other.CompareTag("Tracker") && this.CompareTag("YellowCloud"))
+        {
+            // Play the "Cloud Whoosh" sound effect
+            audioSource.Play();
+
+            // Trigger the fade away animation
+            animator.SetTrigger("Disappear2");
+        }
+
     }
 }
