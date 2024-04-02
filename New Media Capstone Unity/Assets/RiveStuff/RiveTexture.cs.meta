@@ -4,8 +4,9 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - asset: {instanceID: 0}
-  - renderTexture: {instanceID: 0}
+  - asset: {fileID: -4516626237390682484, guid: 2bd758a1970eb514884f49201495e80d, type: 3}
+  - renderTexture: {fileID: 8400000, guid: 482255f1163d5f04f8aa87e8f93e0255, type: 2}
+  - materialTest: {fileID: 2100000, guid: 6bfbe9f5f5afd1943bb3ba082de4c467, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
