@@ -1,7 +1,5 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEditor;
 using Rive;
 
 using LoadAction = UnityEngine.Rendering.RenderBufferLoadAction;
@@ -12,7 +10,6 @@ public class RiveTexture : MonoBehaviour
     public Rive.Asset asset;
     public RenderTexture renderTexture;
     public Material materialTest;
-    //public Camera camera;
 
     public Fit fit = Fit.contain;
     public Alignment alignment = Alignment.Center;
@@ -26,11 +23,20 @@ public class RiveTexture : MonoBehaviour
     private StateMachine m_stateMachine;
 
     private Camera m_camera;
+    private SpriteRenderer spriteRenderer;
 
     private void Start()
     {
         // If on D3d11, this is required
-       // GetComponent<Camera>().targetTexture = renderTexture;
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if(spriteRenderer == null)
+        {
+            Debug.LogError("SpriteRenderer component not found.");
+            return;
+        }
+
+
         materialTest.mainTexture = renderTexture;
         gameObject.GetComponent<UnityEngine.Renderer>().material = materialTest;
         renderTexture.enableRandomWrite = true;
@@ -46,11 +52,12 @@ public class RiveTexture : MonoBehaviour
         if (m_artboard != null && renderTexture != null)
         {
             m_riveRenderer.Align(fit, alignment, m_artboard);
+            materialTest.SetTexture("_BaseMap", renderTexture);
             m_riveRenderer.Draw(m_artboard);
 
-            m_commandBuffer = m_riveRenderer.ToCommandBuffer();
+           m_commandBuffer = new CommandBuffer();
             m_commandBuffer.SetRenderTarget(renderTexture);
-            m_commandBuffer.ClearRenderTarget(true, true, UnityEngine.Color.clear, 0.0f);
+            m_commandBuffer.ClearRenderTarget(true, true, UnityEngine.Color.clear);
             m_riveRenderer.AddToCommandBuffer(m_commandBuffer);
             m_camera = Camera.main;
             if (m_camera != null)
@@ -61,7 +68,7 @@ public class RiveTexture : MonoBehaviour
     }
 
     private void Update()
-    {
+    { 
         if (m_stateMachine != null)
         {
             m_stateMachine.Advance(Time.deltaTime);
