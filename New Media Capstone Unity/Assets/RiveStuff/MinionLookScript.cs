@@ -27,7 +27,7 @@ public class MinionLookScript : MonoBehaviour
 
     void Update()
     {
-        Vector3 pos = peopleFollower.transform.position;
+        Vector3 pos = KinectCoordinates.Instance.GetNearestFollower(Vector3.zero);
         Vector3 directionToCamera = pos - transform.position;
         directionToCamera.Normalize();
         float xProduct = Vector3.Dot(transform.right, directionToCamera);

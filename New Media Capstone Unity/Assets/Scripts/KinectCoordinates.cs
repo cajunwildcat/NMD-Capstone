@@ -4,6 +4,17 @@ using UnityEngine;
 using Windows.Kinect;
 
 public class KinectCoordinates : MonoBehaviour {
+    static KinectCoordinates instance;
+    public static KinectCoordinates Instance => instance;
+    public void Awake() {
+        if (instance == null) {
+            instance = this;
+        }
+        else {
+            Destroy(gameObject);
+        }
+    }
+
     public KinectSensor sensor;
     public BodyFrameReader bodyFrameReaders;
     public GameObject peopleFollower;
@@ -175,4 +186,17 @@ public class KinectCoordinates : MonoBehaviour {
         }
     }
 
+    public Vector3 GetNearestFollower(Vector3 point) {
+        if (trackedPeople.Count < 1) return Vector3.zero;
+        float minDist = float.MaxValue;
+        ulong minID = 0;
+        foreach (ulong trackers in trackedPeople.Keys) {
+            float dist = Vector3.Distance(trackedPeople[trackers].transform.position,point);
+            if (dist < minDist) {
+                minDist = dist;
+                minID = trackers;
+            }
+        }
+        return trackedPeople[minID].transform.position;
+    }
 }
