@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 using Rive;
+using System.Collections.Generic;
 
 public class RiveTexture : MonoBehaviour {
     public Asset asset;
@@ -15,8 +16,9 @@ public class RiveTexture : MonoBehaviour {
 
     private File m_file;
     private Artboard m_artboard;
-    private StateMachine m_stateMachine;
-    public StateMachine stateMachine => m_stateMachine;
+    private List<StateMachine> stateMachines = new();
+    public List<StateMachine> StateMachines => stateMachines;
+    public Artboard artboard => m_artboard;
 
     private void Awake() {
         _renderTexture = new RenderTexture(
@@ -36,7 +38,9 @@ public class RiveTexture : MonoBehaviour {
         if (asset != null) {
             m_file = Rive.File.Load(asset);
             m_artboard = m_file.Artboard(0);
-            m_stateMachine = m_artboard?.StateMachine();
+            for (uint i = 0; i < m_artboard?.StateMachineCount;i++) {
+                stateMachines.Add(m_artboard.StateMachine(i));
+            }
         }
 
         if (m_artboard != null && _renderTexture != null) {
@@ -53,8 +57,5 @@ public class RiveTexture : MonoBehaviour {
 
     private void Update() {
         m_riveRenderer.Submit();
-        if (m_stateMachine != null) {
-            m_stateMachine.Advance(Time.deltaTime);
-        }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Windows.Kinect;
 
 public class KinectCoordinates : MonoBehaviour {
@@ -198,5 +199,26 @@ public class KinectCoordinates : MonoBehaviour {
             }
         }
         return trackedPeople[minID].transform.position;
+    }
+
+    public List<Vector3> GetAllNormalizedTrackerPositions() {
+        List<Vector3> positions = new();
+        foreach (ulong trackers in trackedPeople.Keys) {
+            Vector3 trackerPos = trackedPeople[trackers].transform.position;
+            float xl = trackerPos.x;
+            float x = (xl - min.x) / (max.x - min.x);
+            float yl = trackerPos.y;
+            float y = (yl - min.y) / (max.y - min.y);
+
+            positions.Add(new Vector3(x, y, 0));
+        }
+        return positions;
+    }
+
+    [ContextMenu("Make Dummy Tracker")]
+    public void MakeDummyTracker() {
+        GameObject newTracker = Instantiate(peopleFollower, transform.position, Quaternion.identity);
+        newTracker.transform.SetParent(transform);
+        trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
     }
 }
