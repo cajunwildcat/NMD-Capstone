@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    public AudioSource vocalsAudioSource; // Assign this to the vocals audio source in the inspector
-    public AudioSource[] audioSources; // Assign all other audio sources to this array in the inspector
+    public AudioSource vocalsAudioSource; // This is the Final one that gets activated last
+    public AudioSource[] audioSources; // Assign all other audio sources, except startingAudio, That need to get activated prior to the final one
     public AudioSource startingAudioSource; // The track that should play from the start
 
     void Start()

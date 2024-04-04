@@ -483,7 +483,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: ceb46e954d8fff648b82623556bd1ebe, type: 3}
+  m_audioClip: {fileID: 8300000, guid: bccc131b7fb9b8d41a81623958edfeb4, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.367
   m_Pitch: 1
@@ -1085,7 +1085,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 57d654334606ada429978d6c1aa079b5, type: 3}
+  m_audioClip: {fileID: 8300000, guid: b7d31eb8f4edf72448d3365b129c12b5, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.37
   m_Pitch: 1
@@ -1335,7 +1335,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 1638dc889d2f707469e49686b6206883, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 65b8b852a50b60443979717c840608fb, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.349
   m_Pitch: 1
@@ -1830,12 +1830,12 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: cb1abdfb3185ab34e842b411b477d4e3, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 3899f2a54cf171441a70a1a1be775bc9, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.349
   m_Pitch: 1
   Loop: 1
-  Mute: 0
+  Mute: 1
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
@@ -1844,7 +1844,7 @@ AudioSource:
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
-  BypassEffects: 1
+  BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
   rolloffCustomCurve:
@@ -2202,12 +2202,12 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 8acc64aa75b36e443aa6fc1261fe9e4d, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 519bab43b7f6fa7479f5648e37d9d9d0, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.345
   m_Pitch: 1
   Loop: 1
-  Mute: 0
+  Mute: 1
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
@@ -2216,7 +2216,7 @@ AudioSource:
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
-  BypassEffects: 1
+  BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
   rolloffCustomCurve:
