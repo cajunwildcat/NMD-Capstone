@@ -151,11 +151,11 @@ MonoBehaviour:
   peopleFollower: {fileID: 343499153897624774, guid: 25a08e54dd252864ba989671b154f03d, type: 3}
   min: {x: -16, y: -9}
   max: {x: 16, y: 9}
-  switchXZ: 1
+  switchXZ: 0
   flipLong: 0
-  flipShort: 0
+  flipShort: 1
   trackerScale: 1
-  kinectDepthCutOffs: {x: 1.2069317, y: 4.361993}
+  kinectDepthCutOffs: {x: 1, y: 3.1}
 --- !u!4 &1337153123
 Transform:
   m_ObjectHideFlags: 0
@@ -394,8 +394,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 61
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 9
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

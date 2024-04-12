@@ -10,8 +10,16 @@ public class KinectCoordinates : MonoBehaviour {
     public void Awake() {
         if (instance == null) {
             instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else {
+            instance.switchXZ = switchXZ;
+            instance.flipLong = flipLong;
+            instance.flipShort = flipShort;
+            instance.trackerScale = 1f;
+            instance.kinectDepthCutOffs = kinectDepthCutOffs;
+            instance.kinectXOffset = kinectXOffset;
+
             Destroy(gameObject);
         }
     }
@@ -65,7 +73,7 @@ public class KinectCoordinates : MonoBehaviour {
 
     //sensor must be unsubscribed from closing the scene / stopping the play
     void OnDestroy() {
-        sensor.Close();
+        sensor?.Close();
     }
 
     //update user position
@@ -117,6 +125,7 @@ public class KinectCoordinates : MonoBehaviour {
                         GameObject newPerson = Instantiate(peopleFollower, transform.position, Quaternion.identity);
                         newPerson.transform.localScale = Vector3.one * trackerScale;
                         trackedPeople.Add(trackingId, newPerson);
+                        DontDestroyOnLoad(newPerson);
                     }
 
                     // Get the GameObject associated with this trackingId
