@@ -1,23 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Windows.Kinect;
 
-public class KinectCoordinates : MonoBehaviour {
-    static KinectCoordinates instance;
-    public static KinectCoordinates Instance => instance;
-    public void Awake() {
-        if (instance == null) {
-            instance = this;
-        }
-        else {
-            Destroy(gameObject);
-        }
-    }
-
+public class KinectCoordinatesTwoTest : MonoBehaviour
+{
     public KinectSensor sensor;
-    public BodyFrameReader bodyFrameReaders;
+    public BodyFrameReader bodyFrameReader;
     public GameObject peopleFollower;
 
     public Vector2 min;
@@ -30,76 +19,105 @@ public class KinectCoordinates : MonoBehaviour {
     public bool flipShort = false;
     public float trackerScale = 1f;
     public Vector2 kinectDepthCutOffs = new Vector2(0f, 5f);
+
     float kinectXOffset;
 
     bool setNextZero = false;
     bool setNextDepthMin = false;
     bool setNextDepthMax = false;
 
-    private void OnDrawGizmos() {
+    // New variables for the corners of the depth recognition area
+    public Vector2 topLeft, topRight, bottomLeft, bottomRight;
+
+    private void OnDrawGizmos()
+    {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(max+min, new Vector3(Mathf.Abs(min.x) + Mathf.Abs(max.x), Mathf.Abs(min.y) + Mathf.Abs(max.y)));
+        Gizmos.DrawWireCube(max + min, new Vector3(Mathf.Abs(min.x) + Mathf.Abs(max.x), Mathf.Abs(min.y) + Mathf.Abs(max.y), 0));
+        // Optional: Visualize the depth corners in the Unity Editor
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(new Vector3(topLeft.x, topLeft.y, 0), new Vector3(topRight.x, topRight.y, 0));
+        Gizmos.DrawLine(new Vector3(topRight.x, topRight.y, 0), new Vector3(bottomRight.x, bottomRight.y, 0));
+        Gizmos.DrawLine(new Vector3(bottomRight.x, bottomRight.y, 0), new Vector3(bottomLeft.x, bottomLeft.y, 0));
+        Gizmos.DrawLine(new Vector3(bottomLeft.x, bottomLeft.y, 0), new Vector3(topLeft.x, topLeft.y, 0));
     }
 
-    void Start() {
-        sensor = KinectSensor.GetDefault(); //gets the Kinect Sensor connected to current PC. only one allowed per PC
-        bodyFrameReaders = sensor.BodyFrameSource.OpenReader(); //reads the body frame picked up by the Kinect
+    void Start()
+    {
+        if(KinectSensor.GetDefault() != null)
+        {
+            sensor = KinectSensor.GetDefault();
+            bodyFrameReader = sensor.BodyFrameSource.OpenReader();
+            bodyFrameReader.FrameArrived += (sender, args) => BodyFrameArrived(sender, args);
+            sensor.Open();
+        }
+        else
+        {
+            Debug.LogError("Kinect Sensor Not Found");
+        }
 
-        // lambda function that calls BodyFrameArrived method
-        //actively sends over the data to determine position.
-        bodyFrameReaders.FrameArrived += (sender, args) => BodyFrameArrived(sender, args); 
-        //sensor must be set to open to operate
-        sensor.Open();
-        
-        if (flipLong) {
+
+        if (flipLong)
+        {
             float temp = min.x;
             min.x = max.x;
             max.x = temp;
         }
-        if (flipShort) {
+        if (flipShort)
+        {
             float temp = min.y;
             min.y = max.y;
             max.y = temp;
         }
     }
 
-    //sensor must be unsubscribed from closing the scene / stopping the play
-    void OnDestroy() {
+    void OnDestroy()
+    {
         sensor.Close();
     }
 
-    //update user position
-    private void Update() {
+    void Update()
+    {
         transform.position = pos;
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
             SetXZero();
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
             SetKinectMin();
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2)) {
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
             SetKinectMax();
         }
+
+        // Calculate and update the corners of the depth recognition area
+        CalculateDepthCorners();
     }
 
-    private void SetXZero() {
+    private void SetXZero()
+    {
         setNextZero = true;
     }
 
-    private void SetKinectMin() {
+    private void SetKinectMin()
+    {
         setNextDepthMin = true;
     }
 
-    private void SetKinectMax() {
+    private void SetKinectMax()
+    {
         setNextDepthMax = true;
     }
 
-    // Define a dictionary to keep track of the GameObjects associated with each TrackingId
     Dictionary<ulong, GameObject> trackedPeople = new Dictionary<ulong, GameObject>();
 
-    private void BodyFrameArrived(object sender, BodyFrameArrivedEventArgs args) {
-        using (var bodyFrame = args.FrameReference.AcquireFrame()) {
-            if (bodyFrame == null) {
+    private void BodyFrameArrived(object sender, BodyFrameArrivedEventArgs args)
+    {
+        using (var bodyFrame = args.FrameReference.AcquireFrame())
+        {
+            if (bodyFrame == null)
+            {
                 return;
             }
 
@@ -107,12 +125,15 @@ public class KinectCoordinates : MonoBehaviour {
             bodyFrame.GetAndRefreshBodyData(bodies);
 
             // Iterate through each body
-            foreach (var body in bodies) {
-                if (body.IsTracked) {
+            foreach (var body in bodies)
+            {
+                if (body.IsTracked)
+                {
                     ulong trackingId = body.TrackingId;
 
                     // Check if we already have a GameObject associated with this trackingId
-                    if (!trackedPeople.ContainsKey(trackingId)) {
+                    if (!trackedPeople.ContainsKey(trackingId))
+                    {
                         // If not, instantiate a new child object from the peopleFollower prefab
                         GameObject newPerson = Instantiate(peopleFollower, transform.position, Quaternion.identity);
                         newPerson.transform.localScale = Vector3.one * trackerScale;
@@ -125,16 +146,19 @@ public class KinectCoordinates : MonoBehaviour {
                     // Get top-down coordinates of the tracked body
                     CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
 
-                    if (setNextZero) {
+                    if (setNextZero)
+                    {
                         kinectXOffset = position.X * -1;
                         transform.GetChild(0).gameObject.SetActive(false);
                         setNextZero = false;
                     }
-                    if (setNextDepthMin) {
+                    if (setNextDepthMin)
+                    {
                         kinectDepthCutOffs.x = position.Z;
                         setNextDepthMin = false;
                     }
-                    if (setNextDepthMax) {
+                    if (setNextDepthMax)
+                    {
                         kinectDepthCutOffs.y = position.Z;
                         setNextDepthMax = false;
                     }
@@ -145,7 +169,8 @@ public class KinectCoordinates : MonoBehaviour {
 
                     // Calculate the position in Unity coordinates
                     float x, y;
-                    if (switchXZ) {
+                    if (switchXZ)
+                    {
                         y = Mathf.Lerp(min.y, max.y, (position.X + 1) / 2);
                         float l = position.Z;
                         float t;
@@ -153,7 +178,8 @@ public class KinectCoordinates : MonoBehaviour {
                         else t = (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
                         x = Mathf.Lerp(min.x, max.x, t);
                     }
-                    else {
+                    else
+                    {
                         x = Mathf.Lerp(min.x, max.x, (position.X + 1) / 2);
                         float l = position.Z;
                         float t = (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
@@ -168,11 +194,13 @@ public class KinectCoordinates : MonoBehaviour {
 
             // Check for any tracked people who are no longer being tracked and remove their GameObjects
             List<ulong> toRemove = new List<ulong>();
-            foreach (var kvp in trackedPeople) {
+            foreach (var kvp in trackedPeople)
+            {
                 ulong trackingId = kvp.Key;
                 GameObject personObject = kvp.Value;
                 bool isTracked = Array.Exists(bodies, b => b.IsTracked && b.TrackingId == trackingId);
-                if (!isTracked) {
+                if (!isTracked)
+                {
                     // If the person is no longer tracked, mark it for removal
                     toRemove.Add(trackingId);
                     // Destroy the associated GameObject
@@ -181,44 +209,29 @@ public class KinectCoordinates : MonoBehaviour {
             }
 
             // Remove the tracked people who are no longer being tracked from the dictionary
-            foreach (var key in toRemove) {
+            foreach (var key in toRemove)
+            {
                 trackedPeople.Remove(key);
             }
         }
     }
 
-    public Vector3 GetNearestFollower(Vector3 point) {
-        if (trackedPeople.Count < 1) return Vector3.zero;
-        float minDist = float.MaxValue;
-        ulong minID = 0;
-        foreach (ulong trackers in trackedPeople.Keys) {
-            float dist = Vector3.Distance(trackedPeople[trackers].transform.position,point);
-            if (dist < minDist) {
-                minDist = dist;
-                minID = trackers;
-            }
-        }
-        return trackedPeople[minID].transform.position;
-    }
+    void CalculateDepthCorners()
+    {
+        float depth = (kinectDepthCutOffs.x + kinectDepthCutOffs.y) / 2; // Example: using mid-depth for calculation
+        float hFov = Mathf.Deg2Rad * 70.0f / 2; // Kinect horizontal FOV in radians divided by 2
+        float vFov = Mathf.Deg2Rad * 60.0f / 2; // Kinect vertical FOV in radians divided by 2
 
-    public List<Vector3> GetAllNormalizedTrackerPositions() {
-        List<Vector3> positions = new();
-        foreach (ulong trackers in trackedPeople.Keys) {
-            Vector3 trackerPos = trackedPeople[trackers].transform.position;
-            float xl = trackerPos.x;
-            float x = (xl - min.x) / (max.x - min.x);
-            float yl = trackerPos.y;
-            float y = (yl - min.y) / (max.y - min.y);
+        float hMax = depth * Mathf.Tan(hFov);
+        float vMax = depth * Mathf.Tan(vFov);
 
-            positions.Add(new Vector3(x, y, 0));
-        }
-        return positions;
-    }
+        // Assuming the Kinect is centered at (0,0) in its own coordinate system
+        topLeft = new Vector2(-hMax, vMax);
+        topRight = new Vector2(hMax, vMax);
+        bottomLeft = new Vector2(-hMax, -vMax);
+        bottomRight = new Vector2(hMax, -vMax);
 
-    [ContextMenu("Make Dummy Tracker")]
-    public void MakeDummyTracker() {
-        GameObject newTracker = Instantiate(peopleFollower, transform.position, Quaternion.identity);
-        newTracker.transform.SetParent(transform);
-        trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
+        // Now topLeft, topRight, bottomLeft, and bottomRight contain the corners
     }
 }
+
