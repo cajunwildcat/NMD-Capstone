@@ -17,8 +17,8 @@ public class KinectCoordinates : MonoBehaviour {
             instance.flipLong = flipLong;
             instance.flipShort = flipShort;
             instance.trackerScale = 1f;
-            instance.kinectDepthCutOffs = kinectDepthCutOffs;
-            instance.kinectXOffset = kinectXOffset;
+            //instance.kinectDepthCutOffs = kinectDepthCutOffs;
+            //instance.kinectXOffset = kinectXOffset;
 
             Destroy(gameObject);
         }
