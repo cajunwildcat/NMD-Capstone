@@ -452,23 +452,23 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 531359786}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5bf8bd2c514335d45975012867af9723, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   peopleFollower: {fileID: 343499153897624774, guid: 25a08e54dd252864ba989671b154f03d, type: 3}
-  min: {x: 0, y: 0}
-  max: {x: 0, y: 0}
+  min: {x: -10, y: -6}
+  max: {x: 10, y: 6}
   switchXZ: 0
   flipLong: 0
   flipShort: 0
   trackerScale: 1
-  kinectDepthCutOffs: {x: 0, y: 5}
-  topLeft: {x: 0, y: 0}
-  topRight: {x: 0, y: 0}
-  bottomLeft: {x: 0, y: 0}
-  bottomRight: {x: 0, y: 0}
+  kinectDepthCutOffs: {x: 1, y: 3.1}
+  topLeft: {x: -10, y: 6}
+  topRight: {x: 10, y: 6}
+  bottomLeft: {x: -10, y: -6}
+  bottomRight: {x: 10, y: -6}
 --- !u!1 &610985300
 GameObject:
   m_ObjectHideFlags: 0
