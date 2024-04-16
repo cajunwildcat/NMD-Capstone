@@ -10,8 +10,28 @@ public class KinectCoordinates : MonoBehaviour {
     public void Awake() {
         if (instance == null) {
             instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else {
+            instance.switchXZ = switchXZ;
+            instance.flipLong = flipLong;
+            instance.flipShort = flipShort;
+            instance.trackerScale = 1f;
+            instance.min = min;
+            instance.max = max;
+            if (flipLong) {
+                float temp = min.x;
+                instance.min.x = max.x;
+                instance.max.x = temp;
+            }
+            if (flipShort) {
+                float temp = min.y;
+                instance.min.y = max.y;
+                instance.max.y = temp;
+            }
+            //instance.kinectDepthCutOffs = kinectDepthCutOffs;
+            //instance.kinectXOffset = kinectXOffset;
+
             Destroy(gameObject);
         }
     }
@@ -65,7 +85,7 @@ public class KinectCoordinates : MonoBehaviour {
 
     //sensor must be unsubscribed from closing the scene / stopping the play
     void OnDestroy() {
-        sensor.Close();
+        sensor?.Close();
     }
 
     //update user position
@@ -117,6 +137,7 @@ public class KinectCoordinates : MonoBehaviour {
                         GameObject newPerson = Instantiate(peopleFollower, transform.position, Quaternion.identity);
                         newPerson.transform.localScale = Vector3.one * trackerScale;
                         trackedPeople.Add(trackingId, newPerson);
+                        DontDestroyOnLoad(newPerson);
                     }
 
                     // Get the GameObject associated with this trackingId
@@ -215,10 +236,20 @@ public class KinectCoordinates : MonoBehaviour {
         return positions;
     }
 
+    public List<Tuple<GameObject, Vector3>> GetAllTrackerPositions() {
+        List<Tuple<GameObject,Vector3>> positions = new();
+        foreach (ulong trackers in trackedPeople.Keys) {
+            Vector3 trackerPos = trackedPeople[trackers].transform.position;
+            positions.Add(new(trackedPeople[trackers], trackerPos));
+        }
+        return positions;
+    }
+
     [ContextMenu("Make Dummy Tracker")]
     public void MakeDummyTracker() {
         GameObject newTracker = Instantiate(peopleFollower, transform.position, Quaternion.identity);
-        newTracker.transform.SetParent(transform);
+        newTracker.transform.localScale = Vector3.one * trackerScale;
         trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
+        DontDestroyOnLoad(newTracker);
     }
 }
