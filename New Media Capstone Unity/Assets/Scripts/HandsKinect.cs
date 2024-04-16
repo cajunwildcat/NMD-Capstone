@@ -47,6 +47,8 @@ public class HandsKinect : MonoBehaviour
     public BodyFrameReader bodyFrameReaders;
     public GameObject peopleFollower;
 
+    public GameObject handPrefab;
+
     public Vector2 min;
     public Vector2 max;
 
@@ -62,6 +64,13 @@ public class HandsKinect : MonoBehaviour
     bool setNextZero = false;
     bool setNextDepthMin = false;
     bool setNextDepthMax = false;
+
+    public class TrackedPerson
+     {
+      public GameObject bodyObject;
+     public GameObject leftHandObject;
+     public GameObject rightHandObject;
+     }
 
     private void OnDrawGizmos()
     {
@@ -134,8 +143,8 @@ public class HandsKinect : MonoBehaviour
     }
 
     // Define a dictionary to keep track of the GameObjects associated with each TrackingId
-    Dictionary<ulong, GameObject> trackedPeople = new Dictionary<ulong, GameObject>();
-
+   // Dictionary<ulong, GameObject> trackedPeople = new Dictionary<ulong, GameObject>();
+    Dictionary<ulong, TrackedPerson> trackedPeople = new Dictionary<ulong, TrackedPerson>();
     private void BodyFrameArrived(object sender, BodyFrameArrivedEventArgs args)
     {
         using (var bodyFrame = args.FrameReference.AcquireFrame())
@@ -160,18 +169,36 @@ public class HandsKinect : MonoBehaviour
                     // Check if we already have a GameObject associated with this trackingId
                     if (!trackedPeople.ContainsKey(trackingId))
                     {
+
+                        var newPerson = new TrackedPerson
+                        {
+                            bodyObject = Instantiate(peopleFollower, Vector3.zero, Quaternion.identity),
+                            leftHandObject = Instantiate(handPrefab, Vector3.zero, Quaternion.identity),
+                            rightHandObject = Instantiate(handPrefab, Vector3.zero, Quaternion.identity)
+                        };
                         // If not, instantiate a new child object from the peopleFollower prefab
-                        GameObject newPerson = Instantiate(peopleFollower, transform.position, Quaternion.identity);
-                        newPerson.transform.localScale = Vector3.one * trackerScale;
+                        // GameObject newPerson = Instantiate(peopleFollower, transform.position, Quaternion.identity);
+
+                        newPerson.bodyObject.transform.localScale = Vector3.one * trackerScale;
+                        DontDestroyOnLoad(newPerson.bodyObject);
+                        DontDestroyOnLoad(newPerson.leftHandObject);
+                        DontDestroyOnLoad(newPerson.rightHandObject);
                         trackedPeople.Add(trackingId, newPerson);
-                        DontDestroyOnLoad(newPerson);
+
+                        //  newPerson.transform.localScale = Vector3.one * trackerScale;
+                        // trackedPeople.Add(trackingId, newPerson);
+                        //  DontDestroyOnLoad(newPerson);
                     }
 
+                    var person = trackedPeople[trackingId];
+
                     // Get the GameObject associated with this trackingId
-                    GameObject personObject = trackedPeople[trackingId];
+                    UpdateBodyPosition(body, person.bodyObject);
+                    UpdateHandPosition(body, person.leftHandObject, JointType.HandLeft);
+                    UpdateHandPosition(body, person.rightHandObject, JointType.HandRight);
 
                     // Get top-down coordinates of the tracked body
-                    CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
+/*                    CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
 
                     if (setNextZero)
                     {
@@ -190,12 +217,12 @@ public class HandsKinect : MonoBehaviour
                         setNextDepthMax = false;
                     }
 
-                    position.X += kinectXOffset;
+                    position.X += kinectXOffset;*/
 
                     //Debug.Log(position);
 
                     // Calculate the position in Unity coordinates
-                    float x, y;
+/*                    float x, y;
                     if (switchXZ)
                     {
                         y = Mathf.Lerp(min.y, max.y, (position.X + 1) / 2);
@@ -211,17 +238,35 @@ public class HandsKinect : MonoBehaviour
                         float l = position.Z;
                         float t = (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
                         y = Mathf.Lerp(min.y, max.y, t);
-                    }
+                    }*/
 
                     // Update the position of the personObject
 
-                    personObject.transform.position = new Vector3(x, y, 0);
+                  //  personObject.transform.position = new Vector3(x, y, 0);
                 }
             }
 
             // Check for any tracked people who are no longer being tracked and remove their GameObjects
             List<ulong> toRemove = new List<ulong>();
             foreach (var kvp in trackedPeople)
+            {
+                if (!Array.Exists(bodies, b => b.IsTracked && b.TrackingId == kvp.Key))
+                {
+                    toRemove.Add(kvp.Key);
+                }
+            }
+
+            foreach (var key in toRemove)
+            {
+                var person = trackedPeople[key];
+                Destroy(person.bodyObject);
+                Destroy(person.leftHandObject);
+                Destroy(person.rightHandObject);
+                trackedPeople.Remove(key);
+            }
+        
+
+           /* foreach (var kvp in trackedPeople)
             {
                 ulong trackingId = kvp.Key;
                 GameObject personObject = kvp.Value;
@@ -239,8 +284,62 @@ public class HandsKinect : MonoBehaviour
             foreach (var key in toRemove)
             {
                 trackedPeople.Remove(key);
-            }
+            }*/
         }
+    }
+    private void UpdateBodyPosition(Body body, GameObject bodyObject)
+    {
+        CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
+        position.X += kinectXOffset; // Adjust the X position
+
+        float x, y;
+        if (switchXZ)
+        {
+            y = Mathf.Lerp(min.y, max.y, (position.X + 1) / 2);
+            float l = position.Z;
+            // Ensure l is within the bounds of kinectDepthCutOffs before normalization
+            float t = (l <= kinectDepthCutOffs.x) ? 0 :
+                      (l >= kinectDepthCutOffs.y) ? 1 :
+                      (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
+            x = Mathf.Lerp(min.x, max.x, t);
+        }
+        else
+        {
+            x = Mathf.Lerp(min.x, max.x, (position.X + 1) / 2);
+            float l = position.Z;
+            // Normalization with respect to Z depth
+            float t = (l <= kinectDepthCutOffs.x) ? 0 :
+                      (l >= kinectDepthCutOffs.y) ? 1 :
+                      (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
+            y = Mathf.Lerp(min.y, max.y, t);
+        }
+
+        bodyObject.transform.position = new Vector3(x, y, 0);
+    }
+
+    private void UpdateHandPosition(Body body, GameObject handObject, JointType handType)
+    {
+        CameraSpacePoint handPosition = body.Joints[handType].Position;
+        handPosition.X += kinectXOffset;
+
+        float x, y;
+        if (switchXZ)
+        {
+            y = Mathf.Lerp(min.y, max.y, (handPosition.X + 1) / 2);
+            float l = handPosition.Z;
+            float t = (l <= kinectDepthCutOffs.x) ? 0 : (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
+            x = Mathf.Lerp(min.x, max.x, t);
+
+        }
+        else
+        {
+            x = Mathf.Lerp(min.x, max.x, (handPosition.X + 1) / 2);
+            float l = handPosition.Z;
+            float t = (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
+            y = Mathf.Lerp(min.y, max.y, t);
+        }
+
+        handObject.transform.position = new Vector3(x, y, 0);
     }
 
 
@@ -273,18 +372,31 @@ public class HandsKinect : MonoBehaviour
         if (trackedPeople.Count < 1) return Vector3.zero;
         float minDist = float.MaxValue;
         ulong minID = 0;
-        foreach (ulong trackers in trackedPeople.Keys)
+
+        foreach(ulong trackerID in trackedPeople.Keys)
         {
-            float dist = Vector3.Distance(trackedPeople[trackers].transform.position, point);
-            if (dist < minDist)
+            float dist = Vector3.Distance(trackedPeople[trackerID].bodyObject.transform.position, point);
+            if(dist < minDist)
             {
                 minDist = dist;
-                minID = trackers;
+                minID = trackerID;
             }
         }
-        return trackedPeople[minID].transform.position;
-    }
 
+        /*        foreach (ulong trackers in trackedPeople.Keys)
+                {
+                    float dist = Vector3.Distance(trackedPeople[trackers].transform.position, point);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        minID = trackers;
+                    }
+                }
+        return trackedPeople[minID].transform.position;
+         */
+        return trackedPeople[minID].bodyObject.transform.position;
+    }
+/*
     public List<Vector3> GetAllNormalizedTrackerPositions()
     {
         List<Vector3> positions = new();
@@ -299,9 +411,25 @@ public class HandsKinect : MonoBehaviour
             positions.Add(new Vector3(x, y, 0));
         }
         return positions;
+    }*/
+
+    public List<Vector3> GetAllNormalizedTrackerPositions()
+    {
+        List<Vector3> positions = new List<Vector3>();
+        foreach(ulong trackerID in trackedPeople.Keys)
+        {
+            Vector3 trackerPos = trackedPeople[trackerID].bodyObject.transform.position;
+            float x1 = trackerPos.x;
+            float x = (x1 - min.x) / (max.x - min.x);
+            float y1 = trackerPos.y;
+            float y = (y1 - min.y) / (max.y - min.y);
+
+            positions.Add(new Vector3(x, y, 0));
+        }
+        return positions;
     }
 
-    public List<Tuple<GameObject, Vector3>> GetAllTrackerPositions()
+/*    public List<Tuple<GameObject, Vector3>> GetAllTrackerPositions()
     {
         List<Tuple<GameObject, Vector3>> positions = new();
         foreach (ulong trackers in trackedPeople.Keys)
@@ -310,14 +438,46 @@ public class HandsKinect : MonoBehaviour
             positions.Add(new(trackedPeople[trackers], trackerPos));
         }
         return positions;
+    }*/
+    public List<Tuple<GameObject, Vector3>> GetAllTrackerPositions()
+    {
+        List<Tuple<GameObject, Vector3>> positions = new List<Tuple<GameObject, Vector3>>();
+        foreach (ulong trackerID in trackedPeople.Keys)
+        {
+            Vector3 trackerPos = trackedPeople[trackerID].bodyObject.transform.position;
+            positions.Add(new Tuple<GameObject, Vector3>(trackedPeople[trackerID].bodyObject, trackerPos));
+        }
+        return positions;
     }
 
-    [ContextMenu("Make Dummy Tracker")]
+
+/*    [ContextMenu("Make Dummy Tracker")]
     public void MakeDummyTracker()
     {
         GameObject newTracker = Instantiate(peopleFollower, transform.position, Quaternion.identity);
         newTracker.transform.localScale = Vector3.one * trackerScale;
         trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
         DontDestroyOnLoad(newTracker);
+    }*/
+    [ContextMenu("Make Dummy Tracker")]
+    public void MakeDummyTracker()
+    {
+        GameObject bodyObject = Instantiate(peopleFollower, transform.position, Quaternion.identity);
+        bodyObject.transform.localScale = Vector3.one * trackerScale;
+        DontDestroyOnLoad(bodyObject);
+
+        GameObject leftHandObject = Instantiate(handPrefab, transform.position, Quaternion.identity);
+        GameObject rightHandObject = Instantiate(handPrefab, transform.position, Quaternion.identity);
+        DontDestroyOnLoad(leftHandObject);
+        DontDestroyOnLoad(rightHandObject);
+
+        TrackedPerson newTracker = new TrackedPerson
+        {
+            bodyObject = bodyObject,
+            leftHandObject = leftHandObject,
+            rightHandObject = rightHandObject
+        };
+
+        trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
     }
 }
