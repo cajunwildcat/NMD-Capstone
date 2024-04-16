@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 267502096}
   - component: {fileID: 267502095}
   m_Layer: 0
-  m_Name: Black Background
+  m_Name: SVG Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

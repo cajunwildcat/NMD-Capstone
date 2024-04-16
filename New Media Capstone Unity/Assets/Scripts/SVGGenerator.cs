@@ -12,6 +12,7 @@ public class SVGGenerator : MonoBehaviour {
             GameObject newMesh = Instantiate(SVGMeshPrefab);
             SVGData data = new SVGData();
             data.Path(path);
+            data.MoveRelative(-860, -540);
             newMesh.GetComponent<SVGMesh>().Fill(data);
             //newMesh.GetComponent<MeshCollider>().sharedMesh = newMesh.GetComponent<MeshFilter>().sharedMesh;
             newMesh.transform.SetParent(transform, true);
