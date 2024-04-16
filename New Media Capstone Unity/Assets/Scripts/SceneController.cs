@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,9 +11,11 @@ public class SceneController : MonoBehaviour {
 
     public Image fadePanel;
     public Image switchProgress;
+    public TMP_Text switchText;
 
     private float switchCounter = 0;
-    private float switchAfter = 5;
+    private readonly float switchAfter = 15;
+    private float countDownStart = 5;
     private int currentSceneIndex;
     private bool switching = false;
 
@@ -28,28 +31,41 @@ public class SceneController : MonoBehaviour {
 
     private void Start() {
         currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        Cursor.visible = false;
     }
 
     private void Update() {
         if (!switching) {
             switchCounter += Time.deltaTime;
-            switchProgress.fillAmount = switchCounter / switchAfter;
+            float fillAmount = 1- (switchCounter / switchAfter);
+            switchProgress.fillAmount = fillAmount;
+            for (int i = 0; i < switchProgress.transform.childCount; i++) {
+                switchProgress.transform.GetChild(i).GetComponent<Image>().fillAmount = fillAmount;
+            }
+        }
+        if (switchCounter >= switchAfter - countDownStart) {
+            switchText.enabled = true;
+            switchText.text = $"Switching in {(int)(switchAfter-switchCounter) + 1}";
         }
         if (switchCounter >= switchAfter) {
+            SwitchScene();
+        }
+        if (Input.GetKeyDown(KeyCode.Space)) {
             SwitchScene();
         }
     }
 
     void SwitchScene() {
+        switchText.enabled = false;
         switching = true;
         currentSceneIndex++;
-        currentSceneIndex %= 2;
+        currentSceneIndex %= SceneManager.sceneCountInBuildSettings;
         switchProgress.fillAmount = 0;
         switchCounter = 0;
-        StartCoroutine(FadeToColor(0.5f, Color.black));
+        StartCoroutine(FadeToColor(0.5f, Color.white));
         StartCoroutine(WaitFor(0.5f, () => { 
             SceneManager.LoadScene(currentSceneIndex); 
-            StartCoroutine(FadeToColor(0.5f, new Color(0, 0, 0, 0)));
+            StartCoroutine(FadeToColor(0.5f, new Color(1,1,1, 0)));
             StartCoroutine(WaitFor(0.5f, () => switching = false));
         }));
     }
