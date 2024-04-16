@@ -14,13 +14,15 @@ public class SceneController : MonoBehaviour {
     public TMP_Text switchText;
 
     private float switchCounter = 0;
-    private readonly float switchAfter = 15;
+    public float switchAfter = 55;
     private float countDownStart = 5;
     private int currentSceneIndex;
     private bool switching = false;
+    public bool flipProgressDir = true;
 
     private void Awake() {
         if (instance) {
+            instance.switchAfter = switchAfter;
             Destroy(gameObject);
         }
         else {
@@ -37,7 +39,7 @@ public class SceneController : MonoBehaviour {
     private void Update() {
         if (!switching) {
             switchCounter += Time.deltaTime;
-            float fillAmount = 1- (switchCounter / switchAfter);
+            float fillAmount = flipProgressDir? (switchCounter / switchAfter) : 1 - (switchCounter / switchAfter);
             switchProgress.fillAmount = fillAmount;
             for (int i = 0; i < switchProgress.transform.childCount; i++) {
                 switchProgress.transform.GetChild(i).GetComponent<Image>().fillAmount = fillAmount;

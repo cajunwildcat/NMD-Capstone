@@ -55,6 +55,8 @@ MonoBehaviour:
   fadePanel: {fileID: 4633099804724506400}
   switchProgress: {fileID: 960301358446829276}
   switchText: {fileID: 323322555706320726}
+  switchAfter: 55
+  flipProgressDir: 1
 --- !u!223 &6338543351261741958
 Canvas:
   m_ObjectHideFlags: 0

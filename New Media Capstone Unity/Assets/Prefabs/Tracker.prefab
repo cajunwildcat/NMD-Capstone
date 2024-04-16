@@ -48,11 +48,11 @@ MonoBehaviour:
   peopleFollower: {fileID: 343499153897624774, guid: 25a08e54dd252864ba989671b154f03d, type: 3}
   min: {x: -10, y: -6}
   max: {x: 10, y: 6}
-  switchXZ: 0
+  switchXZ: 1
   flipLong: 0
-  flipShort: 1
+  flipShort: 0
   trackerScale: 1
-  kinectDepthCutOffs: {x: 1, y: 3.1}
+  kinectDepthCutOffs: {x: 1, y: 5}
 --- !u!1 &4883124162228994939
 GameObject:
   m_ObjectHideFlags: 0
@@ -69,7 +69,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &498675045902965313
 Transform:
   m_ObjectHideFlags: 0
