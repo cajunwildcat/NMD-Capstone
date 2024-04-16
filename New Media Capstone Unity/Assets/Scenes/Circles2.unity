@@ -401,6 +401,7 @@ GameObject:
   m_Component:
   - component: {fileID: 531359789}
   - component: {fileID: 531359787}
+  - component: {fileID: 531359790}
   m_Layer: 0
   m_Name: Tracker
   m_TagString: Untagged
@@ -415,7 +416,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 531359786}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b14e5c3f19d2a4408acedb33d643bce, type: 3}
   m_Name: 
@@ -444,6 +445,30 @@ Transform:
   - {fileID: 1887977674}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &531359790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531359786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bf8bd2c514335d45975012867af9723, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  peopleFollower: {fileID: 0}
+  min: {x: 0, y: 0}
+  max: {x: 0, y: 0}
+  switchXZ: 0
+  flipLong: 0
+  flipShort: 0
+  trackerScale: 1
+  kinectDepthCutOffs: {x: 0, y: 5}
+  topLeft: {x: 0, y: 0}
+  topRight: {x: 0, y: 0}
+  bottomLeft: {x: 0, y: 0}
+  bottomRight: {x: 0, y: 0}
 --- !u!1 &610985300
 GameObject:
   m_ObjectHideFlags: 0
