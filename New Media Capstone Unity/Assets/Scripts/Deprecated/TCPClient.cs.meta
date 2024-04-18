@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 4c2e1274a32148b4a92269437f633213
+=======
+guid: e835ba9e5c422024ca4d36ccf9f5fbff
+>>>>>>> parent of 1c519aa (new sounds implemented)
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
