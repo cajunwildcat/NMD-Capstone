@@ -4,5 +4,18 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
+<<<<<<< Updated upstream
   m_Scenes: []
+=======
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Audio/Scenes/Circles2.unity
+    guid: faca9b920862c66409aa024739bbfeff
+  - enabled: 1
+    path: Assets/Audio/Scenes/Columns.unity
+    guid: 6825e859e17a5ec40a3352992a1f3f92
+  - enabled: 1
+    path: Assets/Audio/Scenes/Drawing.unity
+    guid: 8977e6a502b26bd4db4925af5d44790d
+>>>>>>> Stashed changes
   m_configObjects: {}

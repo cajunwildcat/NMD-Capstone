@@ -1,6 +1,10 @@
 {
   "dependencies": {
+<<<<<<< Updated upstream
     "com.unity.2d.animation": "5.0.10",
+=======
+    "com.unity.2d.animation": "10.1.1",
+>>>>>>> Stashed changes
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "1.15.18",
     "com.unity.ide.rider": "2.0.7",
