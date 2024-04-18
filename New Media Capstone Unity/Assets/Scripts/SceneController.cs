@@ -20,6 +20,10 @@ public class SceneController : MonoBehaviour {
     private bool switching = false;
     public bool flipProgressDir = true;
 
+    private Action switchFunction;
+    int transitionCirlceCount;
+    float[] startingRadii;
+
     private void Awake() {
         if (instance) {
             instance.switchAfter = switchAfter;
@@ -33,7 +37,19 @@ public class SceneController : MonoBehaviour {
 
     private void Start() {
         currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+#if !UNITY_EDITOR
         Cursor.visible = false;
+#endif
+
+        switchFunction = SwitchSceneCircles;
+
+        transitionCirlceCount = fadePanel.transform.childCount;
+        startingRadii = new float[transitionCirlceCount];
+        for (int i = 0; i < transitionCirlceCount; i++) { 
+            Transform circle = fadePanel.transform.GetChild(i);
+            startingRadii[i] = circle.localScale.x;
+            //circle.localScale = Vector3.zero;
+        }
     }
 
     private void Update() {
@@ -50,14 +66,14 @@ public class SceneController : MonoBehaviour {
             switchText.text = $"Switching in {(int)(switchAfter-switchCounter) + 1}";
         }
         if (switchCounter >= switchAfter) {
-            SwitchScene();
+            switchFunction();
         }
         if (Input.GetKeyDown(KeyCode.Space)) {
-            SwitchScene();
+            switchFunction();
         }
     }
 
-    void SwitchScene() {
+    void SwitchSceneFade() {
         switchText.enabled = false;
         switching = true;
         currentSceneIndex++;
@@ -70,6 +86,45 @@ public class SceneController : MonoBehaviour {
             StartCoroutine(FadeToColor(0.5f, new Color(1,1,1, 0)));
             StartCoroutine(WaitFor(0.5f, () => switching = false));
         }));
+    }
+
+    void SwitchSceneCircles() {
+        switchText.enabled = false;
+        switching = true;
+        currentSceneIndex++;
+        currentSceneIndex %= SceneManager.sceneCountInBuildSettings;
+        switchProgress.fillAmount = 0;
+        switchCounter = 0;
+        for (int i = 0; i < transitionCirlceCount; i++) {
+            fadePanel.transform.GetChild(i).GetComponent<Animator>().SetBool("Grow", true);
+        }
+        StartCoroutine(WaitFor(1, () => {
+            SceneManager.LoadScene(currentSceneIndex, LoadSceneMode.Additive);
+            for (int i = 0; i < transitionCirlceCount; i++) {
+                fadePanel.transform.GetChild(i).GetComponent<Animator>().SetBool("Grow", false);
+            }
+            StartCoroutine(WaitFor(1, () => switching = false));
+
+        }));
+    }
+
+
+    IEnumerator GrowCircles(float time, bool grow) {
+        Debug.Log(transitionCirlceCount);
+        float counter = 0;
+        while (counter < time) {
+            counter += Time.deltaTime;
+            float progress = counter / time;
+            for (int i = 0; i < transitionCirlceCount; i++) {
+                if (grow) {
+                    fadePanel.transform.GetChild(i).transform.localScale = Vector3.one * Mathf.Lerp(0, startingRadii[i], progress);
+                }
+                else {
+                    fadePanel.transform.GetChild(i).transform.localScale = Vector3.one * Mathf.Lerp(startingRadii[i], 0, progress);
+                }
+            }
+            yield return null;
+        }
     }
 
      IEnumerator FadeToColor(float time, Color newColor) {
