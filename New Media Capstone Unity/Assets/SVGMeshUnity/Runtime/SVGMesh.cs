@@ -56,7 +56,7 @@ namespace SVGMeshUnity
             MeshData.MakeUnityFriendly();
             MeshData.Upload(Mesh);
 
-            var filter = GetComponent<MeshFilter>();
+            var filter =transform.GetChild(0).GetComponent<MeshFilter>();
             if (filter != null)
             {
                 filter.sharedMesh = Mesh;

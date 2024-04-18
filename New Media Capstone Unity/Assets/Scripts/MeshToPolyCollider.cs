@@ -4,13 +4,13 @@ using UnityEngine;
 public class MeshToPolyCollider : MonoBehaviour {
     void Start() {
         // Stop if no mesh filter exists or there's already a collider
-        if (GetComponent<PolygonCollider2D>() || GetComponent<MeshFilter>() == null) {
+        if (GetComponent<PolygonCollider2D>() || transform.GetChild(0).GetComponent<MeshFilter>() == null) {
             return;
         }
 
         // Get triangles and vertices from mesh
-        int[] triangles = GetComponent<MeshFilter>().mesh.triangles;
-        Vector3[] vertices = GetComponent<MeshFilter>().mesh.vertices;
+        int[] triangles = transform.GetChild(0).GetComponent<MeshFilter>().mesh.triangles;
+        Vector3[] vertices = transform.GetChild(0).GetComponent<MeshFilter>().mesh.vertices;
 
         // Get just the outer edges from the mesh's triangles (ignore or remove any shared edges)
         Dictionary<string, KeyValuePair<int, int>> edges = new Dictionary<string, KeyValuePair<int, int>>();

@@ -14,7 +14,7 @@ public class TileActivator : MonoBehaviour {
             GameObject gm = hit.collider.gameObject;
             switch (gm.tag) {
                 case "SVG Tile":
-                    gm.GetComponent<MeshRenderer>().enabled = true;
+                    gm.GetComponent<SVGTile>().Activate();
                     break;
                 case "CircleTile":
                     gm.GetComponent<CircleTile>().Activate();
