@@ -43,6 +43,8 @@ public class HandsKinect : MonoBehaviour
         }
     }
 
+    public GameObject[] gradientObjects;
+
     public KinectSensor sensor;
     public BodyFrameReader bodyFrameReaders;
     public GameObject peopleFollower;
@@ -67,9 +69,9 @@ public class HandsKinect : MonoBehaviour
 
     public class TrackedPerson
      {
-      public GameObject bodyObject;
-     public GameObject leftHandObject;
-     public GameObject rightHandObject;
+        public GameObject bodyObject;
+        public GameObject leftHandObject;
+        public GameObject rightHandObject;
      }
 
     private void OnDrawGizmos()
@@ -103,7 +105,7 @@ public class HandsKinect : MonoBehaviour
         }
     }
 
-    //sensor must be unsubscribed from closing the scene / stopping the play
+    //sensor must be unsubscribed from to close the scene / stop the play
     void OnDestroy()
     {
         sensor?.Close();
@@ -156,8 +158,8 @@ public class HandsKinect : MonoBehaviour
 
             Body[] bodies = new Body[sensor.BodyFrameSource.BodyCount];
             bodyFrame.GetAndRefreshBodyData(bodies);
-
-            CheckForRaisedHandsAndChangeScene(bodies);
+            GradientChangeOnGesture(bodies);
+           // CheckForRaisedHandsAndChangeScene(bodies);
 
             // Iterate through each body
             foreach (var body in bodies)
@@ -287,6 +289,34 @@ public class HandsKinect : MonoBehaviour
             }*/
         }
     }
+
+
+
+
+
+    public void CycleSpriteRenderersOrder()
+    {
+        if (gradientObjects.Length == 0) return;
+
+        // Get the first GameObject's SpriteRenderer sorting order
+        int firstOrder = gradientObjects[0].GetComponent<SpriteRenderer>().sortingOrder;
+
+        // Corrected the loop condition to iterate through all elements except the last one
+        for (int i = 0; i < gradientObjects.Length - 1; i++)
+        {
+            gradientObjects[i].GetComponent<SpriteRenderer>().sortingOrder = gradientObjects[i + 1].GetComponent<SpriteRenderer>().sortingOrder;
+        }
+
+        // Set the last GameObject's SpriteRenderer sorting order to what was initially the first's
+        gradientObjects[gradientObjects.Length - 1].GetComponent<SpriteRenderer>().sortingOrder = firstOrder;
+
+        // This additional step cycles the GameObjects in the array, not just their sorting orders
+        GameObject firstGradientObject = gradientObjects[0];
+        Array.Copy(gradientObjects, 1, gradientObjects, 0, gradientObjects.Length - 1);
+        gradientObjects[gradientObjects.Length - 1] = firstGradientObject;
+    }
+
+
     private void UpdateBodyPosition(Body body, GameObject bodyObject)
     {
         CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
@@ -343,7 +373,39 @@ public class HandsKinect : MonoBehaviour
     }
 
 
-    private void CheckForRaisedHandsAndChangeScene(Body[] bodies)
+    private bool canChangeGradient = true;
+    private float gestureCooldown = 1.0f; // Cooldown period in seconds after a gesture is recognized
+    private float lastGestureTime = -1.0f; // Time at which the last gesture was recognized
+
+    private void GradientChangeOnGesture(Body[] bodies)
+    {
+        if(!canChangeGradient && Time.time - lastGestureTime > gestureCooldown)
+        {
+            canChangeGradient = true;
+        }
+
+        foreach (var body in bodies)
+        {
+            if (body.IsTracked)
+            {
+                var headPosition = body.Joints[JointType.Head].Position;
+                var leftHandPosition = body.Joints[JointType.HandTipLeft].Position;
+                var rightHandPosition = body.Joints[JointType.HandTipRight].Position;
+
+                // Ensure we can change the gradient and the gesture is detected
+                if (canChangeGradient && leftHandPosition.Y > headPosition.Y && rightHandPosition.Y > headPosition.Y)
+                {
+                    CycleSpriteRenderersOrder();
+                    lastGestureTime = Time.time; // Record the time of the gesture
+                    canChangeGradient = false; // Reset the flag to enter cooldown
+                    break; // Exit the loop after handling the gesture
+                }
+            }
+        }
+    }
+
+
+/*    private void CheckForRaisedHandsAndChangeScene(Body[] bodies)
     {
         foreach (var body in bodies)
         {
@@ -360,7 +422,7 @@ public class HandsKinect : MonoBehaviour
                 }
             }
         }
-    }
+    }*/
 
     private void ChangeScene()
     {
@@ -447,7 +509,7 @@ public class HandsKinect : MonoBehaviour
             Vector3 trackerPos = trackedPeople[trackerID].bodyObject.transform.position;
             positions.Add(new Tuple<GameObject, Vector3>(trackedPeople[trackerID].bodyObject, trackerPos));
         }
-        return positions;
+        return positions; 
     }
 
 
