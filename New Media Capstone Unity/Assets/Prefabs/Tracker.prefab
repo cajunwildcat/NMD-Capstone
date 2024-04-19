@@ -49,7 +49,7 @@ MonoBehaviour:
   min: {x: -10, y: -6}
   max: {x: 10, y: 6}
   switchXZ: 1
-  flipLong: 0
+  flipLong: 1
   flipShort: 0
   trackerScale: 1
   kinectDepthCutOffs: {x: 1, y: 5}
@@ -69,7 +69,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &498675045902965313
 Transform:
   m_ObjectHideFlags: 0

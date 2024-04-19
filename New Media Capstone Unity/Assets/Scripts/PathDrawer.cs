@@ -22,17 +22,18 @@ public class PathDrawer : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        List<Tuple<GameObject, Vector3>> e = KinectCoordinates.Instance.GetAllTrackerPositions();
-        foreach (Tuple<GameObject, Vector3> b in e) {
-            if (!colors.ContainsKey(b.Item1)) {
-                colors.Add(b.Item1, possibleColors[UnityEngine.Random.Range(0, possibleColors.Length)]);
+        List<GameObject> trackers = KinectCoordinates.Instance.GetAllTrackerObjects();
+        foreach (GameObject tracker in trackers) {
+            Vector3 pos = tracker.transform.position;
+            if (!colors.ContainsKey(tracker)) {
+                colors.Add(tracker, possibleColors[UnityEngine.Random.Range(0, possibleColors.Length)]);
             }
-            if (lastPos.ContainsKey(b.Item1) && b.Item2 == lastPos[b.Item1]) { continue; }
-            GameObject colorTrail = Instantiate(circlePrefab, b.Item2, Quaternion.identity);
-            colorTrail.GetComponent<SpriteRenderer>().color = colors[b.Item1];
+            if (lastPos.ContainsKey(tracker) && pos == lastPos[tracker]) { continue; }
+            GameObject colorTrail = Instantiate(circlePrefab, pos, Quaternion.identity);
+            colorTrail.GetComponent<SpriteRenderer>().color = colors[tracker];
             colorTrail.transform.SetParent(transform);
-            colorTrail.transform.localScale = b.Item1.transform.localScale;
-            lastPos[b.Item1] = b.Item2;
+            colorTrail.transform.localScale = tracker.transform.localScale;
+            lastPos[tracker] = pos;
         }
     }
 }

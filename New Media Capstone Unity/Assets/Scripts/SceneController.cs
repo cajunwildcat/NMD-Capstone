@@ -99,7 +99,7 @@ public class SceneController : MonoBehaviour {
             fadePanel.transform.GetChild(i).GetComponent<Animator>().SetBool("Grow", true);
         }
         StartCoroutine(WaitFor(1, () => {
-            SceneManager.LoadScene(currentSceneIndex, LoadSceneMode.Additive);
+            SceneManager.LoadScene(currentSceneIndex);
             for (int i = 0; i < transitionCirlceCount; i++) {
                 fadePanel.transform.GetChild(i).GetComponent<Animator>().SetBool("Grow", false);
             }

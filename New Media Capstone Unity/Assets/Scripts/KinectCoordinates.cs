@@ -14,17 +14,17 @@ public class KinectCoordinates : MonoBehaviour {
         }
         else {
             instance.switchXZ = switchXZ;
-            instance.flipLong = flipLong;
-            instance.flipShort = flipShort;
-            instance.trackerScale = 1f;
+            //instance.flipLong = flipLong;
+            //instance.flipShort = flipShort;
+            instance.trackerScale = trackerScale;
             instance.min = min;
             instance.max = max;
-            if (flipLong) {
+            if (instance.flipLong) {
                 float temp = min.x;
                 instance.min.x = max.x;
                 instance.max.x = temp;
             }
-            if (flipShort) {
+            if (instance.flipShort) {
                 float temp = min.y;
                 instance.min.y = max.y;
                 instance.max.y = temp;
@@ -81,6 +81,9 @@ public class KinectCoordinates : MonoBehaviour {
             min.y = max.y;
             max.y = temp;
         }
+
+
+        MakeDummyTracker();
     }
 
     //sensor must be unsubscribed from closing the scene / stopping the play
@@ -131,6 +134,11 @@ public class KinectCoordinates : MonoBehaviour {
                 if (body.IsTracked) {
                     ulong trackingId = body.TrackingId;
 
+                    // Get top-down coordinates of the tracked body
+                    CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
+                    position.X += kinectXOffset;
+                    if (Mathf.Abs(position.X) > 1.5f) continue;
+
                     // Check if we already have a GameObject associated with this trackingId
                     if (!trackedPeople.ContainsKey(trackingId)) {
                         // If not, instantiate a new child object from the peopleFollower prefab
@@ -143,8 +151,7 @@ public class KinectCoordinates : MonoBehaviour {
                     // Get the GameObject associated with this trackingId
                     GameObject personObject = trackedPeople[trackingId];
 
-                    // Get top-down coordinates of the tracked body
-                    CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
+
 
                     if (setNextZero) {
                         kinectXOffset = position.X * -1;
@@ -159,8 +166,6 @@ public class KinectCoordinates : MonoBehaviour {
                         kinectDepthCutOffs.y = position.Z;
                         setNextDepthMax = false;
                     }
-
-                    position.X += kinectXOffset;
 
                     //Debug.Log(position);
 
@@ -236,11 +241,18 @@ public class KinectCoordinates : MonoBehaviour {
         return positions;
     }
 
-    public List<Tuple<GameObject, Vector3>> GetAllTrackerPositions() {
-        List<Tuple<GameObject,Vector3>> positions = new();
-        foreach (ulong trackers in trackedPeople.Keys) {
-            Vector3 trackerPos = trackedPeople[trackers].transform.position;
-            positions.Add(new(trackedPeople[trackers], trackerPos));
+    public List<GameObject> GetAllTrackerObjects() {
+        List<GameObject> trackers = new();
+        foreach (ulong trackerID in trackedPeople.Keys) {
+            trackers.Add(trackedPeople[trackerID]);
+        }
+        return trackers;
+    }
+
+    public List<Vector3> GetAllTrackerWorldPositions() {
+        List<Vector3> positions = new();
+        foreach (ulong trackerID in trackedPeople.Keys) {
+            positions.Add(trackedPeople[trackerID].transform.position);
         }
         return positions;
     }
