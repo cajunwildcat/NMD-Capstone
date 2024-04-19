@@ -1,5 +1,15 @@
 {
+  "scopedRegistires": [
+    {
+      "name": "Keijiro",
+      "url": "https://registry.npmjs.com",
+      "scopes": [
+        "jp.keijiro"
+      ]
+    }
+  ],
   "dependencies": {
+    "jp.keijiro.klak.spout": "2.0.3",
     "app.rive.rive-unity": "https://github.com/rive-app/rive-unity.git?path=package#v0.1.106",
     "com.unity.2d.animation": "10.1.1",
     "com.unity.2d.sprite": "1.0.0",

@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
-using static UnityEditor.PlayerSettings;
 
 [RequireComponent(typeof(RiveTexture))]
 internal class RiveTrackerInput : MonoBehaviour {
