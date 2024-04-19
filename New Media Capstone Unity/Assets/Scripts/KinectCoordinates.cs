@@ -83,7 +83,7 @@ public class KinectCoordinates : MonoBehaviour {
         }
 
 
-        MakeDummyTracker();
+        //MakeDummyTracker();
     }
 
     //sensor must be unsubscribed from closing the scene / stopping the play

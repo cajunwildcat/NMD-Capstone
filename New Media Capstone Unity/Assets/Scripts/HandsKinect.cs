@@ -512,15 +512,31 @@ public class HandsKinect : MonoBehaviour
         return positions; 
     }
 
+    public List<GameObject> GetAllTrackerObjects() {
+        List<GameObject> trackers = new();
+        foreach (ulong trackerID in trackedPeople.Keys) {
+            trackers.Add(trackedPeople[trackerID].bodyObject);
+        }
+        return trackers;
+    }
 
-/*    [ContextMenu("Make Dummy Tracker")]
-    public void MakeDummyTracker()
-    {
-        GameObject newTracker = Instantiate(peopleFollower, transform.position, Quaternion.identity);
-        newTracker.transform.localScale = Vector3.one * trackerScale;
-        trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
-        DontDestroyOnLoad(newTracker);
-    }*/
+    public List<Vector3> GetAllTrackerWorldPositions() {
+        List<Vector3> positions = new();
+        foreach (ulong trackerID in trackedPeople.Keys) {
+            positions.Add(trackedPeople[trackerID].bodyObject.transform.position);
+        }
+        return positions;
+    }
+
+
+    /*    [ContextMenu("Make Dummy Tracker")]
+        public void MakeDummyTracker()
+        {
+            GameObject newTracker = Instantiate(peopleFollower, transform.position, Quaternion.identity);
+            newTracker.transform.localScale = Vector3.one * trackerScale;
+            trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
+            DontDestroyOnLoad(newTracker);
+        }*/
     [ContextMenu("Make Dummy Tracker")]
     public void MakeDummyTracker()
     {
