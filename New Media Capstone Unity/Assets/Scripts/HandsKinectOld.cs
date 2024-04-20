@@ -5,19 +5,10 @@ using UnityEngine.UIElements;
 using Windows.Kinect;
 using UnityEngine.SceneManagement;
 
-public class HandsKinect : MonoBehaviour
+public class HandsKinectOld : MonoBehaviour
 {
-    static HandsKinect instance;
-    public static HandsKinect Instance => instance;
-
-    [System.Serializable]
-    public struct TrackedPersonData {
-        public ulong TrackingId;
-        public Vector3 KinectCoordinates;
-        public Vector3 UnityWorldCoordinates;
-    }
-
-
+    static HandsKinectOld instance;
+    public static HandsKinectOld Instance => instance;
     public void Awake()
     {
         if (instance == null)
@@ -45,6 +36,9 @@ public class HandsKinect : MonoBehaviour
                 instance.min.y = max.y;
                 instance.max.y = temp;
             }
+            //instance.kinectDepthCutOffs = kinectDepthCutOffs;
+            //instance.kinectXOffset = kinectXOffset;
+
             Destroy(gameObject);
         }
     }
@@ -77,13 +71,11 @@ public class HandsKinect : MonoBehaviour
     public Vector2 topLeft, topRight, bottomLeft, bottomRight;
 
     public class TrackedPerson
-     {
+    {
         public GameObject bodyObject;
         public GameObject leftHandObject;
         public GameObject rightHandObject;
-
-        public Vector3 lastKinectPosition;
-     }
+    }
 
     private void OnDrawGizmos()
     {
@@ -121,6 +113,7 @@ public class HandsKinect : MonoBehaviour
     {
         sensor?.Close();
     }
+
     //update user position
     private void Update()
     {
@@ -140,7 +133,6 @@ public class HandsKinect : MonoBehaviour
 
         // Calculate and update the corners of the depth recognition area
         CalculateDepthCorners();
-        UpdateTrackedPeopleDisplayList();
     }
 
     private void SetXZero()
@@ -158,47 +150,9 @@ public class HandsKinect : MonoBehaviour
         setNextDepthMax = true;
     }
 
-    [SerializeField]
-    private List<TrackedPersonData> trackedPeopleDisplayList = new List<TrackedPersonData>();
-
     // Define a dictionary to keep track of the GameObjects associated with each TrackingId
+    // Dictionary<ulong, GameObject> trackedPeople = new Dictionary<ulong, GameObject>();
     Dictionary<ulong, TrackedPerson> trackedPeople = new Dictionary<ulong, TrackedPerson>();
-
-    public List<(ulong TrackingId, Vector3 KinectCoordinates, Vector3 UnityWorldCoordinates)> GetTrackedPeopleCoordinates()
-    {
-        var results = new List<(ulong, Vector3, Vector3)>();
-
-        foreach (var entry in trackedPeople)
-        {
-            ulong trackingId = entry.Key;
-            TrackedPerson person = entry.Value;
-
-            Vector3 kinectCoordinates = person.lastKinectPosition; // Kinect coordinates
-            Vector3 unityWorldCoordinates = person.bodyObject.transform.position; // Unity world coordinates
-
-            results.Add((trackingId, kinectCoordinates, unityWorldCoordinates));
-        }
-
-        return results;
-    }
-    void UpdateTrackedPeopleDisplayList()
-    {
-        var trackedData = GetTrackedPeopleCoordinates();
-        trackedPeopleDisplayList.Clear();
-
-        foreach (var data in trackedData)
-        {
-            TrackedPersonData displayData = new TrackedPersonData
-            {
-                TrackingId = data.TrackingId,
-                KinectCoordinates = data.KinectCoordinates,
-                UnityWorldCoordinates = data.UnityWorldCoordinates
-            };
-
-            trackedPeopleDisplayList.Add(displayData);
-        }
-    }
-
     private void BodyFrameArrived(object sender, BodyFrameArrivedEventArgs args)
     {
         using (var bodyFrame = args.FrameReference.AcquireFrame())
@@ -211,6 +165,7 @@ public class HandsKinect : MonoBehaviour
             Body[] bodies = new Body[sensor.BodyFrameSource.BodyCount];
             bodyFrame.GetAndRefreshBodyData(bodies);
             GradientChangeOnGesture(bodies);
+            // CheckForRaisedHandsAndChangeScene(bodies);
 
             // Iterate through each body
             foreach (var body in bodies)
@@ -229,12 +184,18 @@ public class HandsKinect : MonoBehaviour
                             leftHandObject = Instantiate(handPrefab, Vector3.zero, Quaternion.identity),
                             rightHandObject = Instantiate(handPrefab, Vector3.zero, Quaternion.identity)
                         };
+                        // If not, instantiate a new child object from the peopleFollower prefab
+                        // GameObject newPerson = Instantiate(peopleFollower, transform.position, Quaternion.identity);
 
                         newPerson.bodyObject.transform.localScale = Vector3.one * trackerScale;
                         DontDestroyOnLoad(newPerson.bodyObject);
                         DontDestroyOnLoad(newPerson.leftHandObject);
                         DontDestroyOnLoad(newPerson.rightHandObject);
                         trackedPeople.Add(trackingId, newPerson);
+
+                        //  newPerson.transform.localScale = Vector3.one * trackerScale;
+                        // trackedPeople.Add(trackingId, newPerson);
+                        //  DontDestroyOnLoad(newPerson);
                     }
 
                     var person = trackedPeople[trackingId];
@@ -244,6 +205,52 @@ public class HandsKinect : MonoBehaviour
                     UpdateHandPosition(body, person.leftHandObject, JointType.HandLeft);
                     UpdateHandPosition(body, person.rightHandObject, JointType.HandRight);
 
+                    // Get top-down coordinates of the tracked body
+                    /*                    CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
+
+                                        if (setNextZero)
+                                        {
+                                            kinectXOffset = position.X * -1;
+                                            transform.GetChild(0).gameObject.SetActive(false);
+                                            setNextZero = false;
+                                        }
+                                        if (setNextDepthMin)
+                                        {
+                                            kinectDepthCutOffs.x = position.Z;
+                                            setNextDepthMin = false;
+                                        }
+                                        if (setNextDepthMax)
+                                        {
+                                            kinectDepthCutOffs.y = position.Z;
+                                            setNextDepthMax = false;
+                                        }
+
+                                        position.X += kinectXOffset;*/
+
+                    //Debug.Log(position);
+
+                    // Calculate the position in Unity coordinates
+                    /*                    float x, y;
+                                        if (switchXZ)
+                                        {
+                                            y = Mathf.Lerp(min.y, max.y, (position.X + 1) / 2);
+                                            float l = position.Z;
+                                            float t;
+                                            if (l == kinectDepthCutOffs.x) t = 0;
+                                            else t = (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
+                                            x = Mathf.Lerp(min.x, max.x, t);
+                                        }
+                                        else
+                                        {
+                                            x = Mathf.Lerp(min.x, max.x, (position.X + 1) / 2);
+                                            float l = position.Z;
+                                            float t = (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
+                                            y = Mathf.Lerp(min.y, max.y, t);
+                                        }*/
+
+                    // Update the position of the personObject
+
+                    //  personObject.transform.position = new Vector3(x, y, 0);
                 }
             }
 
@@ -265,6 +272,27 @@ public class HandsKinect : MonoBehaviour
                 Destroy(person.rightHandObject);
                 trackedPeople.Remove(key);
             }
+
+
+            /* foreach (var kvp in trackedPeople)
+             {
+                 ulong trackingId = kvp.Key;
+                 GameObject personObject = kvp.Value;
+                 bool isTracked = Array.Exists(bodies, b => b.IsTracked && b.TrackingId == trackingId);
+                 if (!isTracked)
+                 {
+                     // If the person is no longer tracked, mark it for removal
+                     toRemove.Add(trackingId);
+                     // Destroy the associated GameObject
+                     Destroy(personObject);
+                 }
+             }
+
+             // Remove the tracked people who are no longer being tracked from the dictionary
+             foreach (var key in toRemove)
+             {
+                 trackedPeople.Remove(key);
+             }*/
         }
     }
 
@@ -299,17 +327,6 @@ public class HandsKinect : MonoBehaviour
     {
         CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
         position.X += kinectXOffset; // Adjust the X position
-
-
-        foreach(var person in trackedPeople.Values)
-        {
-            if(person.bodyObject == bodyObject)
-            {
-                person.lastKinectPosition = new Vector3(position.X, position.Y, position.Z);
-                break;
-            }
-        }
-
 
         float x, y;
         if (switchXZ)
@@ -368,7 +385,7 @@ public class HandsKinect : MonoBehaviour
 
     private void GradientChangeOnGesture(Body[] bodies)
     {
-        if(!canChangeGradient && Time.time - lastGestureTime > gestureCooldown)
+        if (!canChangeGradient && Time.time - lastGestureTime > gestureCooldown)
         {
             canChangeGradient = true;
         }
@@ -392,6 +409,27 @@ public class HandsKinect : MonoBehaviour
             }
         }
     }
+
+
+    /*    private void CheckForRaisedHandsAndChangeScene(Body[] bodies)
+        {
+            foreach (var body in bodies)
+            {
+                if (body.IsTracked)
+                {
+                    var headPosition = body.Joints[JointType.Head].Position;
+                    var leftHandPosition = body.Joints[JointType.HandTipLeft].Position;
+                    var rightHandPosition = body.Joints[JointType.HandTipRight].Position;
+
+                    if(leftHandPosition.Y > headPosition.Y && rightHandPosition.Y > headPosition.Y)
+                    {
+                        ChangeScene();
+                        break;
+                    }
+                }
+            }
+        }*/
+
     private void ChangeScene()
     {
         SceneManager.LoadScene("Columns");
@@ -403,15 +441,27 @@ public class HandsKinect : MonoBehaviour
         float minDist = float.MaxValue;
         ulong minID = 0;
 
-        foreach(ulong trackerID in trackedPeople.Keys)
+        foreach (ulong trackerID in trackedPeople.Keys)
         {
             float dist = Vector3.Distance(trackedPeople[trackerID].bodyObject.transform.position, point);
-            if(dist < minDist)
+            if (dist < minDist)
             {
                 minDist = dist;
                 minID = trackerID;
             }
         }
+
+        /*        foreach (ulong trackers in trackedPeople.Keys)
+                {
+                    float dist = Vector3.Distance(trackedPeople[trackers].transform.position, point);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        minID = trackers;
+                    }
+                }
+        return trackedPeople[minID].transform.position;
+         */
         return trackedPeople[minID].bodyObject.transform.position;
     }
 
@@ -433,12 +483,27 @@ public class HandsKinect : MonoBehaviour
 
         // Now topLeft, topRight, bottomLeft, and bottomRight contain the corners
     }
+    /*
+        public List<Vector3> GetAllNormalizedTrackerPositions()
+        {
+            List<Vector3> positions = new();
+            foreach (ulong trackers in trackedPeople.Keys)
+            {
+                Vector3 trackerPos = trackedPeople[trackers].transform.position;
+                float xl = trackerPos.x;
+                float x = (xl - min.x) / (max.x - min.x);
+                float yl = trackerPos.y;
+                float y = (yl - min.y) / (max.y - min.y);
 
+                positions.Add(new Vector3(x, y, 0));
+            }
+            return positions;
+        }*/
 
     public List<Vector3> GetAllNormalizedTrackerPositions()
     {
         List<Vector3> positions = new List<Vector3>();
-        foreach(ulong trackerID in trackedPeople.Keys)
+        foreach (ulong trackerID in trackedPeople.Keys)
         {
             Vector3 trackerPos = trackedPeople[trackerID].bodyObject.transform.position;
             float x1 = trackerPos.x;
@@ -451,6 +516,16 @@ public class HandsKinect : MonoBehaviour
         return positions;
     }
 
+    /*    public List<Tuple<GameObject, Vector3>> GetAllTrackerPositions()
+        {
+            List<Tuple<GameObject, Vector3>> positions = new();
+            foreach (ulong trackers in trackedPeople.Keys)
+            {
+                Vector3 trackerPos = trackedPeople[trackers].transform.position;
+                positions.Add(new(trackedPeople[trackers], trackerPos));
+            }
+            return positions;
+        }*/
     public List<Tuple<GameObject, Vector3>> GetAllTrackerPositions()
     {
         List<Tuple<GameObject, Vector3>> positions = new List<Tuple<GameObject, Vector3>>();
@@ -459,25 +534,38 @@ public class HandsKinect : MonoBehaviour
             Vector3 trackerPos = trackedPeople[trackerID].bodyObject.transform.position;
             positions.Add(new Tuple<GameObject, Vector3>(trackedPeople[trackerID].bodyObject, trackerPos));
         }
-        return positions; 
+        return positions;
     }
 
-    public List<GameObject> GetAllTrackerObjects() {
+    public List<GameObject> GetAllTrackerObjects()
+    {
         List<GameObject> trackers = new();
-        foreach (ulong trackerID in trackedPeople.Keys) {
+        foreach (ulong trackerID in trackedPeople.Keys)
+        {
             trackers.Add(trackedPeople[trackerID].bodyObject);
         }
         return trackers;
     }
 
-    public List<Vector3> GetAllTrackerWorldPositions() {
+    public List<Vector3> GetAllTrackerWorldPositions()
+    {
         List<Vector3> positions = new();
-        foreach (ulong trackerID in trackedPeople.Keys) {
+        foreach (ulong trackerID in trackedPeople.Keys)
+        {
             positions.Add(trackedPeople[trackerID].bodyObject.transform.position);
         }
         return positions;
     }
 
+
+    /*    [ContextMenu("Make Dummy Tracker")]
+        public void MakeDummyTracker()
+        {
+            GameObject newTracker = Instantiate(peopleFollower, transform.position, Quaternion.identity);
+            newTracker.transform.localScale = Vector3.one * trackerScale;
+            trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
+            DontDestroyOnLoad(newTracker);
+        }*/
     [ContextMenu("Make Dummy Tracker")]
     public void MakeDummyTracker()
     {
@@ -495,8 +583,6 @@ public class HandsKinect : MonoBehaviour
             bodyObject = bodyObject,
             leftHandObject = leftHandObject,
             rightHandObject = rightHandObject
-
-            
         };
 
         trackedPeople.Add((ulong)trackedPeople.Count, newTracker);

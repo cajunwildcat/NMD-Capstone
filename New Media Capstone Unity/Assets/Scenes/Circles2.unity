@@ -923,6 +923,11 @@ MonoBehaviour:
   flipShort: 1
   trackerScale: 1
   kinectDepthCutOffs: {x: 1, y: 3.1}
+  topLeft: {x: 0, y: 0}
+  topRight: {x: 0, y: 0}
+  bottomLeft: {x: 0, y: 0}
+  bottomRight: {x: 0, y: 0}
+  trackedPeopleDisplayList: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

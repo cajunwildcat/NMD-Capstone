@@ -29,7 +29,7 @@ internal class RiveTrackerInput : MonoBehaviour {
     }
 
     private void Update() {
-        List<Vector3> trackerPositions = KinectCoordinates.Instance.GetAllTrackerWorldPositions();
+        List<Vector3> trackerPositions = HandsKinect.Instance.GetAllTrackerWorldPositions();
         bool updated = false;
         foreach (Vector3 pos in trackerPositions) {
             Vector2 local = GetArtboardLocalPosition(pos);
