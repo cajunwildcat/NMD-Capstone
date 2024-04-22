@@ -20,6 +20,13 @@ public class KinectTCPServer : MonoBehaviour {
     private static NetworkStream stream;
     private static byte[] receiveBuffer = new byte[1024];
 
+    public static List<CustomBody> ExtraKinectCoordinates = new List<CustomBody>();
+    private static Dictionary<NetworkStream, int> extraKinectIndices = new Dictionary<NetworkStream, int>();
+
+    private void Awake() {
+        DontDestroyOnLoad(gameObject);
+    }
+
     // Start is called before the first frame update
     void Start() {
         StartServer();
@@ -44,6 +51,7 @@ public class KinectTCPServer : MonoBehaviour {
                 stream = client.GetStream();
 
                 stream.BeginRead(receiveBuffer, 0, receiveBuffer.Length, HandleClient, null);
+                extraKinectIndices.Add(stream, extraKinectIndices.Count);
             }
         } catch (Exception ex) {
             Debug.Log($"Error starting server: {ex.Message}");
