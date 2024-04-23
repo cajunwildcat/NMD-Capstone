@@ -127,6 +127,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: max.x
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: max.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: min.x
+      value: -9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: min.y
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: flipLong
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: switchXZ
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2864568145408029266, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

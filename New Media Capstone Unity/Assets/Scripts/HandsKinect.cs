@@ -392,10 +392,6 @@ public class HandsKinect : MonoBehaviour
             }
         }
     }
-    private void ChangeScene()
-    {
-        SceneManager.LoadScene("Columns");
-    }
 
     public Vector3 GetNearestFollower(Vector3 point)
     {

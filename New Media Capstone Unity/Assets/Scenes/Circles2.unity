@@ -837,6 +837,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: 'gradientObjects.Array.data[0]'
+      value: 
+      objectReference: {fileID: 148663372}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: 'gradientObjects.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1821484588}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: 'gradientObjects.Array.data[2]'
+      value: 
+      objectReference: {fileID: 741532957}
     - target: {fileID: 2864568145408029266, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -877,10 +889,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3440473548114280951, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4355210200482251874, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: m_Name
       value: Tracker
@@ -888,46 +896,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4355210200482251874, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3568512904775229633}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
---- !u!1 &3568512904775229632 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4355210200482251874, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
-  m_PrefabInstance: {fileID: 3568512904775229631}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &3568512904775229633
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3568512904775229632}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fb92088af3d0a541acee6ac213f64dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gradientObjects:
-  - {fileID: 148663372}
-  - {fileID: 1821484588}
-  - {fileID: 741532957}
-  peopleFollower: {fileID: 343499153897624774, guid: 25a08e54dd252864ba989671b154f03d, type: 3}
-  handPrefab: {fileID: 343499153897624774, guid: 26e2f8c19d7b66b45aeffd72b593e251, type: 3}
-  min: {x: -10, y: -6}
-  max: {x: 10, y: 6}
-  switchXZ: 0
-  flipLong: 0
-  flipShort: 1
-  trackerScale: 1
-  kinectDepthCutOffs: {x: 1, y: 3.1}
-  topLeft: {x: 0, y: 0}
-  topRight: {x: 0, y: 0}
-  bottomLeft: {x: 0, y: 0}
-  bottomRight: {x: 0, y: 0}
-  trackedPeopleDisplayList: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

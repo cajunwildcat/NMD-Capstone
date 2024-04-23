@@ -40,9 +40,13 @@ public class KinectTCPServer : MonoBehaviour {
 
     }
 
+    private void OnDestroy() {
+        tcpListener.Stop();
+    }
+
     private static async void StartServer() {
         try {
-            tcpListener = new TcpListener(IPAddress.Any, 12345); // Port number can be changed
+            tcpListener = new TcpListener(IPAddress.Any,12345); // Port number can be changed
             tcpListener.Start();
 
             while (true) {
