@@ -14,6 +14,9 @@ public struct CustomBody {
 }
 
 public class KinectTCPServer : MonoBehaviour {
+    private static KinectTCPServer instance;
+    public static KinectTCPServer Instance;
+
     private static TcpListener tcpListener;
 
     private static TcpClient client;
@@ -21,9 +24,14 @@ public class KinectTCPServer : MonoBehaviour {
     private static byte[] receiveBuffer = new byte[1024];
 
     public static List<CustomBody> ExtraKinectCoordinates = new List<CustomBody>();
-    private static Dictionary<NetworkStream, int> extraKinectIndices = new Dictionary<NetworkStream, int>();
+    
 
     private void Awake() {
+        if (instance) {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
         DontDestroyOnLoad(gameObject);
     }
 
@@ -55,7 +63,6 @@ public class KinectTCPServer : MonoBehaviour {
                 stream = client.GetStream();
 
                 stream.BeginRead(receiveBuffer, 0, receiveBuffer.Length, HandleClient, null);
-                extraKinectIndices.Add(stream, extraKinectIndices.Count);
             }
         } catch (Exception ex) {
             Debug.Log($"Error starting server: {ex.Message}");
