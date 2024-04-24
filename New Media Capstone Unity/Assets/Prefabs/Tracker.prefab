@@ -66,17 +66,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fb92088af3d0a541acee6ac213f64dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gradientObjects:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  peopleFollower: {fileID: 343499153897624774, guid: 25a08e54dd252864ba989671b154f03d, type: 3}
-  handPrefab: {fileID: 343499153897624774, guid: 26e2f8c19d7b66b45aeffd72b593e251, type: 3}
+  bodyFollowerPrefab: {fileID: 343499153897624774, guid: 25a08e54dd252864ba989671b154f03d, type: 3}
+  handTrackerPrefab: {fileID: 343499153897624774, guid: 26e2f8c19d7b66b45aeffd72b593e251, type: 3}
   min: {x: -10, y: -6}
   max: {x: 10, y: 6}
-  switchXZ: 0
+  switchXZ: 1
   flipLong: 0
-  flipShort: 1
+  flipShort: 0
   trackerScale: 1
   kinectDepthCutOffs: {x: 1, y: 5}
   topLeft: {x: 0, y: 0}
