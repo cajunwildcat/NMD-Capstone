@@ -210,7 +210,7 @@ public class HandsKinect : MonoBehaviour {
     private void BodyFrameArrived(CustomBody[] bodies) {
         // Iterate through each body
         foreach (var body in bodies) {
-            CameraSpacePoint pos = body.Joints[JointType.SpineMid].Position;
+            CameraSpacePoint pos = body.joints[0].Position;
             if (!KinectSpaceBounds.Contains(new(pos.X + kinectXOffset[1], pos.Z))) continue;
 
             ulong trackingId = body.TrackingId;
@@ -220,7 +220,9 @@ public class HandsKinect : MonoBehaviour {
                 AddNewTrackedPerson(trackingId);
             }
             var person = GetTrackerById(trackingId);
-            UpdateTrackedPerson(person, body);
+            UpdateTrackerPosition(body.joints[0], person.bodyObject);
+            UpdateTrackerPosition(body.joints[1], person.rightHandObject);
+            UpdateTrackerPosition(body.joints[2], person.leftHandObject);
         }
     }
 
