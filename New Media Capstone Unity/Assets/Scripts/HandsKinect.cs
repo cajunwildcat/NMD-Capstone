@@ -6,7 +6,7 @@ using Windows.Kinect;
 using UnityEngine.SceneManagement;
 using System.Linq;
 
-[System.Serializable]
+[Serializable]
 public struct TrackedPersonData {
     public ulong TrackingId;
     public Vector3 KinectCoordinates;
@@ -44,30 +44,27 @@ public class HandsKinect : MonoBehaviour {
     }
     #endregion
 
-    public KinectSensor sensor;
-    public BodyFrameReader bodyFrameReaders;
-    public GameObject peopleFollower;
-
-    public GameObject handPrefab;
+    private KinectSensor sensor;
+    private BodyFrameReader bodyFrameReaders;
+    public GameObject bodyFollowerPrefab;
+    public GameObject handTrackerPrefab;
 
     public Vector2 min;
     public Vector2 max;
-
-    private Vector3 pos;
 
     public bool switchXZ = false;
     public bool flipLong = false;
     public bool flipShort = false;
     public float trackerScale = 1f;
-    public Vector2 kinectDepthCutOffs = new Vector2(0f, 4.5f);
-    float kinectXOffset;
+    public Vector2 kinectDepthCutOffs = new Vector2(0.5f, 4.5f);
+    float[] kinectXOffset = new float[2] { 0f, 0f };
 
-    bool setNextZero = false;
-    bool setNextDepthMin = false;
-    bool setNextDepthMax = false;
+    bool[] setNextZero = new bool[2] { false, false };
+    bool[] setNextDepthMin = new bool[2] { false, false };
+    bool[] setNextDepthMax = new bool[2] { false, false };
 
-    // New variables for the corners of the depth recognition area
-    public Vector2 topLeft, topRight, bottomLeft, bottomRight;
+// New variables for the corners of the depth recognition area
+public Vector2 topLeft, topRight, bottomLeft, bottomRight;
 
     [SerializeField]
     private List<TrackedPersonData> trackedPeopleDisplayList = new List<TrackedPersonData>();
@@ -88,6 +85,7 @@ public class HandsKinect : MonoBehaviour {
         public float timeSinceLastUpdate = 0;
     }
 
+    //Draws a green box outline in world space where the tracker will interpolate kinect position between
     private void OnDrawGizmos() {
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(max + min, new Vector3(Mathf.Abs(min.x) + Mathf.Abs(max.x), Mathf.Abs(min.y) + Mathf.Abs(max.y)));
@@ -121,7 +119,7 @@ public class HandsKinect : MonoBehaviour {
     }
     //update user position
     private void Update() {
-        transform.position = pos;
+        transform.position = Vector3.zero;
         if (Input.GetKeyDown(KeyCode.Space)) {
             SetXZero();
         }
@@ -138,17 +136,18 @@ public class HandsKinect : MonoBehaviour {
     }
 
     private void SetXZero() {
-        setNextZero = true;
+        setNextZero = new bool[2] { true, true };
     }
 
     private void SetKinectMin() {
-        setNextDepthMin = true;
+        setNextDepthMin = new bool[2] { true, true };
     }
 
     private void SetKinectMax() {
-        setNextDepthMax = true;
+        setNextDepthMax = new bool[2] { true, true };
     }
 
+    #region Display Tracked
     public List<(ulong TrackingId, Vector3 KinectCoordinates, Vector3 UnityWorldCoordinates)> GetTrackedPeopleCoordinates() {
         var results = new List<(ulong, Vector3, Vector3)>();
 
@@ -179,6 +178,7 @@ public class HandsKinect : MonoBehaviour {
             trackedPeopleDisplayList.Add(displayData);
         }
     }
+    #endregion
 
     private void BodyFrameArrived(object sender, BodyFrameArrivedEventArgs args) {
         using (var bodyFrame = args.FrameReference.AcquireFrame()) {
@@ -200,7 +200,6 @@ public class HandsKinect : MonoBehaviour {
                 var person = trackedPeople[trackingId];
 
                 // Get the GameObject associated with this trackingId
-                //UpdateBodyPosition(body, person.bodyObject);
                 UpdateTrackerPosition(body, person.bodyObject, JointType.SpineMid);
                 UpdateTrackerPosition(body, person.leftHandObject, JointType.HandLeft);
                 UpdateTrackerPosition(body, person.rightHandObject, JointType.HandRight);
@@ -227,9 +226,9 @@ public class HandsKinect : MonoBehaviour {
 
     private void AddNewTrackedPerson(ulong trackingId) {
         var newPerson = new TrackedPerson {
-            bodyObject = Instantiate(peopleFollower, Vector3.zero, Quaternion.identity),
-            leftHandObject = Instantiate(handPrefab, Vector3.zero, Quaternion.identity),
-            rightHandObject = Instantiate(handPrefab, Vector3.zero, Quaternion.identity)
+            bodyObject = Instantiate(bodyFollowerPrefab, Vector3.zero, Quaternion.identity),
+            leftHandObject = Instantiate(handTrackerPrefab, Vector3.zero, Quaternion.identity),
+            rightHandObject = Instantiate(handTrackerPrefab, Vector3.zero, Quaternion.identity)
         };
 
         newPerson.bodyObject.transform.localScale = Vector3.one * trackerScale;
@@ -275,9 +274,14 @@ public class HandsKinect : MonoBehaviour {
         bodyObject.transform.position = new Vector3(x, y, 0);
     }*/
 
-    private void UpdateTrackerPosition(Body body, GameObject trackerObjects, JointType jointType) {
+    private void UpdateTrackerPosition(Body body, GameObject trackerObject, JointType jointType) {
         CameraSpacePoint position = body.Joints[jointType].Position;
-        position.X += kinectXOffset;
+
+        if (setNextZero[0]) {
+            kinectXOffset[0] = -position.X;
+        }
+
+        position.X += kinectXOffset[0];
 
         float x, y;
         if (switchXZ) {
@@ -299,7 +303,7 @@ public class HandsKinect : MonoBehaviour {
             y = Mathf.Lerp(min.y, max.y, t);
         }
 
-        trackerObjects.transform.position = new Vector3(x, y, 0);
+        trackerObject.transform.position = new Vector3(x, y, 0);
     }
 
     private void GradientChangeOnGesture(Body[] bodies) {
@@ -385,12 +389,12 @@ public class HandsKinect : MonoBehaviour {
 
     [ContextMenu("Make Dummy Tracker")]
     public void MakeDummyTracker() {
-        GameObject bodyObject = Instantiate(peopleFollower, transform.position, Quaternion.identity);
+        GameObject bodyObject = Instantiate(bodyFollowerPrefab, transform.position, Quaternion.identity);
         bodyObject.transform.localScale = Vector3.one * trackerScale;
         DontDestroyOnLoad(bodyObject);
 
-        GameObject leftHandObject = Instantiate(handPrefab, transform.position, Quaternion.identity);
-        GameObject rightHandObject = Instantiate(handPrefab, transform.position, Quaternion.identity);
+        GameObject leftHandObject = Instantiate(handTrackerPrefab, transform.position, Quaternion.identity);
+        GameObject rightHandObject = Instantiate(handTrackerPrefab, transform.position, Quaternion.identity);
         DontDestroyOnLoad(leftHandObject);
         DontDestroyOnLoad(rightHandObject);
 
