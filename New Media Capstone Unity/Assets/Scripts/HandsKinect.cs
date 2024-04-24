@@ -5,6 +5,8 @@ using UnityEngine.UIElements;
 using Windows.Kinect;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using Joint = Windows.Kinect.Joint;
+using TreeEditor;
 
 [Serializable]
 public struct TrackedPersonData {
@@ -13,7 +15,7 @@ public struct TrackedPersonData {
     public Vector3 UnityWorldCoordinates;
 }
 public class HandsKinect : MonoBehaviour {
-    #region Singletone
+    #region Singleton
     static HandsKinect instance;
     public static HandsKinect Instance => instance;
 
@@ -52,31 +54,41 @@ public class HandsKinect : MonoBehaviour {
     public Vector2 min;
     public Vector2 max;
 
+    [Header("Kinect Settings")]
     public bool switchXZ = false;
     public bool flipLong = false;
     public bool flipShort = false;
     public float trackerScale = 1f;
     public Vector2 kinectDepthCutOffs = new Vector2(0.5f, 4.5f);
+    public float kinectXCutOff = 1f;
     float[] kinectXOffset = new float[2] { 0f, 0f };
+    Bounds KinectSpaceBounds {
+        get {
+            return new Bounds(new(0, (kinectDepthCutOffs.y - kinectDepthCutOffs.x) / 2), new(kinectXCutOff * 2, kinectDepthCutOffs.y - kinectDepthCutOffs.x));
+        }
+    }
 
     bool[] setNextZero = new bool[2] { false, false };
     bool[] setNextDepthMin = new bool[2] { false, false };
     bool[] setNextDepthMax = new bool[2] { false, false };
 
-// New variables for the corners of the depth recognition area
-public Vector2 topLeft, topRight, bottomLeft, bottomRight;
+    // New variables for the corners of the depth recognition area
+    public Vector2 topLeft, topRight, bottomLeft, bottomRight;
 
     [SerializeField]
     private List<TrackedPersonData> trackedPeopleDisplayList = new List<TrackedPersonData>();
 
     // Define a dictionary to keep track of the GameObjects associated with each TrackingId
-    Dictionary<ulong, TrackedPerson> trackedPeople = new Dictionary<ulong, TrackedPerson>();
+    //Dictionary<ulong, TrackedPerson> trackedPeople = new Dictionary<ulong, TrackedPerson>();
+    List<TrackedPerson> trackedPeople = new List<TrackedPerson>();
 
-     private bool canChangeGradient = true;
+    private bool canChangeGradient = true;
     private float gestureCooldown = 1.0f; // Cooldown period in seconds after a gesture is recognized
     private float lastGestureTime = -1.0f; // Time at which the last gesture was recognized
 
     public class TrackedPerson {
+        public ulong trackingId;
+
         public GameObject bodyObject;
         public GameObject leftHandObject;
         public GameObject rightHandObject;
@@ -132,7 +144,16 @@ public Vector2 topLeft, topRight, bottomLeft, bottomRight;
 
         // Calculate and update the corners of the depth recognition area
         CalculateDepthCorners();
-        UpdateTrackedPeopleDisplayList();
+        
+        for (int i = 0; i < trackedPeople.Count; i++) {
+            if (trackedPeople[i].trackingId < (ulong)trackedPeople.Count) continue;
+            trackedPeople[i].timeSinceLastUpdate += Time.deltaTime;
+            if (trackedPeople[i].timeSinceLastUpdate > 0.5f) {
+                Destroy(trackedPeople[i].bodyObject);
+                trackedPeople.RemoveAt(i);
+                i--;
+            }
+        }
     }
 
     private void SetXZero() {
@@ -147,38 +168,16 @@ public Vector2 topLeft, topRight, bottomLeft, bottomRight;
         setNextDepthMax = new bool[2] { true, true };
     }
 
-    #region Display Tracked
-    public List<(ulong TrackingId, Vector3 KinectCoordinates, Vector3 UnityWorldCoordinates)> GetTrackedPeopleCoordinates() {
-        var results = new List<(ulong, Vector3, Vector3)>();
-
-        foreach (var entry in trackedPeople) {
-            ulong trackingId = entry.Key;
-            TrackedPerson person = entry.Value;
-
-            Vector3 kinectCoordinates = person.lastKinectPosition; // Kinect coordinates
-            Vector3 unityWorldCoordinates = person.bodyObject.transform.position; // Unity world coordinates
-
-            results.Add((trackingId, kinectCoordinates, unityWorldCoordinates));
+    private TrackedPerson GetTrackerById(ulong id) {
+        foreach (TrackedPerson p in trackedPeople) {
+            if (p.trackingId == id) return p;
         }
-
-        return results;
+        return null;
     }
 
-    void UpdateTrackedPeopleDisplayList() {
-        var trackedData = GetTrackedPeopleCoordinates();
-        trackedPeopleDisplayList.Clear();
-
-        foreach (var data in trackedData) {
-            TrackedPersonData displayData = new TrackedPersonData {
-                TrackingId = data.TrackingId,
-                KinectCoordinates = data.KinectCoordinates,
-                UnityWorldCoordinates = data.UnityWorldCoordinates
-            };
-
-            trackedPeopleDisplayList.Add(displayData);
-        }
+    private bool IsTracked(ulong id) {
+        return GetTrackerById(id) != null;
     }
-    #endregion
 
     private void BodyFrameArrived(object sender, BodyFrameArrivedEventArgs args) {
         using (var bodyFrame = args.FrameReference.AcquireFrame()) {
@@ -190,42 +189,44 @@ public Vector2 topLeft, topRight, bottomLeft, bottomRight;
 
             // Iterate through each body
             foreach (var body in bodies.Where((b)=>b.IsTracked)) {
+                CameraSpacePoint pos = body.Joints[JointType.SpineMid].Position;
+                if (setNextZero[0]) {
+                    kinectXOffset[0] = -pos.X;
+                }
+                if (!KinectSpaceBounds.Contains(new(pos.X + kinectXOffset[0], pos.Z))) continue;
+
                 ulong trackingId = body.TrackingId;
 
                 // Check if we already have a GameObject associated with this trackingId
-                if (!trackedPeople.ContainsKey(trackingId)) {
+                if (!IsTracked(trackingId)) {
                     AddNewTrackedPerson(trackingId);
                 }
-
-                var person = trackedPeople[trackingId];
-
-                // Get the GameObject associated with this trackingId
-                UpdateTrackerPosition(body, person.bodyObject, JointType.SpineMid);
-                UpdateTrackerPosition(body, person.leftHandObject, JointType.HandLeft);
-                UpdateTrackerPosition(body, person.rightHandObject, JointType.HandRight);
-
+                var person = GetTrackerById(trackingId);
+                UpdateTrackedPerson(person, body);
             }
+        }
+    }
 
-            // Check for any tracked people who are no longer being tracked and remove their GameObjects
-            List<ulong> toRemove = new List<ulong>();
-            foreach (var kvp in trackedPeople) {
-                if (!Array.Exists(bodies, b => b.IsTracked && b.TrackingId == kvp.Key)) {
-                    toRemove.Add(kvp.Key);
-                }
-            }
+    private void BodyFrameArrived(CustomBody[] bodies) {
+        // Iterate through each body
+        foreach (var body in bodies) {
+            CameraSpacePoint pos = body.Joints[JointType.SpineMid].Position;
+            if (!KinectSpaceBounds.Contains(new(pos.X + kinectXOffset[1], pos.Z))) continue;
 
-            foreach (var key in toRemove) {
-                var person = trackedPeople[key];
-                Destroy(person.bodyObject);
-                Destroy(person.leftHandObject);
-                Destroy(person.rightHandObject);
-                trackedPeople.Remove(key);
+            ulong trackingId = body.TrackingId;
+
+            // Check if we already have a GameObject associated with this trackingId
+            if (!IsTracked(trackingId)) {
+                AddNewTrackedPerson(trackingId);
             }
+            var person = GetTrackerById(trackingId);
+            UpdateTrackedPerson(person, body);
         }
     }
 
     private void AddNewTrackedPerson(ulong trackingId) {
         var newPerson = new TrackedPerson {
+            trackingId = trackingId,
             bodyObject = Instantiate(bodyFollowerPrefab, Vector3.zero, Quaternion.identity),
             leftHandObject = Instantiate(handTrackerPrefab, Vector3.zero, Quaternion.identity),
             rightHandObject = Instantiate(handTrackerPrefab, Vector3.zero, Quaternion.identity)
@@ -235,51 +236,18 @@ public Vector2 topLeft, topRight, bottomLeft, bottomRight;
         DontDestroyOnLoad(newPerson.bodyObject);
         newPerson.leftHandObject.transform.SetParent(newPerson.bodyObject.transform);
         newPerson.rightHandObject.transform.SetParent(newPerson.bodyObject.transform);
-        trackedPeople.Add(trackingId, newPerson);
+        trackedPeople.Add(newPerson);
     }
 
-    /*private void UpdateBodyPosition(CustomBody body) {
-        CameraSpacePoint position = body.Joints[JointType.SpineMid].Position;
-        position.X += kinectXOffset; // Adjust the X position
+    private void UpdateTrackedPerson(TrackedPerson p, Body b) {
+        UpdateTrackerPosition(b.Joints[JointType.SpineMid], p.bodyObject);
+        UpdateTrackerPosition(b.Joints[JointType.HandLeft], p.leftHandObject);
+        UpdateTrackerPosition(b.Joints[JointType.HandRight], p.rightHandObject);
+        p.timeSinceLastUpdate = 0;
+    }
 
-
-        foreach (var person in trackedPeople.Values) {
-            if (person.bodyObject == bodyObject) {
-                person.lastKinectPosition = new Vector3(position.X, position.Y, position.Z);
-                break;
-            }
-        }
-
-
-        float x, y;
-        if (switchXZ) {
-            y = Mathf.Lerp(min.y, max.y, (position.X + 1) / 2);
-            float l = position.Z;
-            // Ensure l is within the bounds of kinectDepthCutOffs before normalization
-            float t = (l <= kinectDepthCutOffs.x) ? 0 :
-                      (l >= kinectDepthCutOffs.y) ? 1 :
-                      (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
-            x = Mathf.Lerp(min.x, max.x, t);
-        }
-        else {
-            x = Mathf.Lerp(min.x, max.x, (position.X + 1) / 2);
-            float l = position.Z;
-            // Normalization with respect to Z depth
-            float t = (l <= kinectDepthCutOffs.x) ? 0 :
-                      (l >= kinectDepthCutOffs.y) ? 1 :
-                      (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
-            y = Mathf.Lerp(min.y, max.y, t);
-        }
-
-        bodyObject.transform.position = new Vector3(x, y, 0);
-    }*/
-
-    private void UpdateTrackerPosition(Body body, GameObject trackerObject, JointType jointType) {
-        CameraSpacePoint position = body.Joints[jointType].Position;
-
-        if (setNextZero[0]) {
-            kinectXOffset[0] = -position.X;
-        }
+    private void UpdateTrackerPosition(Joint joint, GameObject trackerObject) {
+        CameraSpacePoint position = joint.Position;
 
         position.X += kinectXOffset[0];
 
@@ -347,41 +315,10 @@ public Vector2 topLeft, topRight, bottomLeft, bottomRight;
         // Now topLeft, topRight, bottomLeft, and bottomRight contain the corners
     }
 
-    public List<Vector3> GetAllNormalizedTrackerPositions() {
-        List<Vector3> positions = new List<Vector3>();
-        foreach (ulong trackerID in trackedPeople.Keys) {
-            Vector3 trackerPos = trackedPeople[trackerID].bodyObject.transform.position;
-            float x1 = trackerPos.x;
-            float x = (x1 - min.x) / (max.x - min.x);
-            float y1 = trackerPos.y;
-            float y = (y1 - min.y) / (max.y - min.y);
-
-            positions.Add(new Vector3(x, y, 0));
-        }
-        return positions;
-    }
-
-    public List<Tuple<GameObject, Vector3>> GetAllTrackerPositions() {
-        List<Tuple<GameObject, Vector3>> positions = new List<Tuple<GameObject, Vector3>>();
-        foreach (ulong trackerID in trackedPeople.Keys) {
-            Vector3 trackerPos = trackedPeople[trackerID].bodyObject.transform.position;
-            positions.Add(new Tuple<GameObject, Vector3>(trackedPeople[trackerID].bodyObject, trackerPos));
-        }
-        return positions;
-    }
-
-    public List<GameObject> GetAllTrackerObjects() {
-        List<GameObject> trackers = new();
-        foreach (ulong trackerID in trackedPeople.Keys) {
-            trackers.Add(trackedPeople[trackerID].bodyObject);
-        }
-        return trackers;
-    }
-
     public List<Vector3> GetAllTrackerWorldPositions() {
         List<Vector3> positions = new();
-        foreach (ulong trackerID in trackedPeople.Keys) {
-            positions.Add(trackedPeople[trackerID].bodyObject.transform.position);
+        foreach (TrackedPerson p in trackedPeople) {
+            positions.Add(p.bodyObject.transform.position);
         }
         return positions;
     }
@@ -389,23 +326,6 @@ public Vector2 topLeft, topRight, bottomLeft, bottomRight;
 
     [ContextMenu("Make Dummy Tracker")]
     public void MakeDummyTracker() {
-        GameObject bodyObject = Instantiate(bodyFollowerPrefab, transform.position, Quaternion.identity);
-        bodyObject.transform.localScale = Vector3.one * trackerScale;
-        DontDestroyOnLoad(bodyObject);
-
-        GameObject leftHandObject = Instantiate(handTrackerPrefab, transform.position, Quaternion.identity);
-        GameObject rightHandObject = Instantiate(handTrackerPrefab, transform.position, Quaternion.identity);
-        DontDestroyOnLoad(leftHandObject);
-        DontDestroyOnLoad(rightHandObject);
-
-        TrackedPerson newTracker = new TrackedPerson {
-            bodyObject = bodyObject,
-            leftHandObject = leftHandObject,
-            rightHandObject = rightHandObject
-
-
-        };
-
-        trackedPeople.Add((ulong)trackedPeople.Count, newTracker);
+        AddNewTrackedPerson((ulong)trackedPeople.Count);
     }
 }

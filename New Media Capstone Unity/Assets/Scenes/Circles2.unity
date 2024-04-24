@@ -688,6 +688,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: handTrackerPrefab
+      value: 
+      objectReference: {fileID: 343499153897624774, guid: 26e2f8c19d7b66b45aeffd72b593e251, type: 3}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: bodyFollowerPrefab
+      value: 
+      objectReference: {fileID: 343499153897624774, guid: 25a08e54dd252864ba989671b154f03d, type: 3}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: 'gradientObjects.Array.data[0]'
       value: 
       objectReference: {fileID: 148663372}
