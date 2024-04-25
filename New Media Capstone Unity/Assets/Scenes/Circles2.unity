@@ -622,9 +622,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: SceneCotroller
       objectReference: {fileID: 0}
-    - target: {fileID: 1876270241637645462, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
-      propertyPath: switchAfter
-      value: 15
+    - target: {fileID: 818971889057045623, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
+      propertyPath: m_FillAmount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 960301358446829276, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
+      propertyPath: m_FillAmount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1905492602761200830, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
+      propertyPath: m_FillAmount
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4771317797157875300, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
       propertyPath: m_Pivot.x
@@ -706,9 +714,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6604945415206139374, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
-      propertyPath: m_Enabled
-      value: 1
+    - target: {fileID: 7104608950080301622, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
+      propertyPath: m_FillAmount
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

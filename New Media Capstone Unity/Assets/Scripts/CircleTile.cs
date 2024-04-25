@@ -53,6 +53,7 @@ public class CircleTile : MonoBehaviour {
     }
 
     public void Activate() {
+        if (anim == null) return;
         StopAllCoroutines();
         anim.SetBool("Reveal", true);
         sm.sprite = sr.sprite;

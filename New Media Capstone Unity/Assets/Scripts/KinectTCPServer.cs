@@ -58,7 +58,7 @@ public class KinectTCPServer : MonoBehaviour {
                 client = new TcpClient();
                 if (!client.ConnectAsync("192.168.0.101", 12345).Wait(8)) {
                     //the server isn't running
-                    Debug.Log("The server isnt running, cannot get extra kinect data");
+                    Debug.LogWarning("The server isnt running, cannot get extra kinect data");
                     return;
                 }
                 NetworkStream stream = client.GetStream();
@@ -68,7 +68,7 @@ public class KinectTCPServer : MonoBehaviour {
                 while ((i = stream.Read(buffer, 0, buffer.Length)) != 0)
                 {
                     string s = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
-                    Debug.Log(s);
+                    //Debug.Log(s);
                     ExtraKinectCoordinates = JsonConvert.DeserializeObject<CustomBody[]>(s);
                     NewExtraKinectDataEvent?.Invoke();
                 }

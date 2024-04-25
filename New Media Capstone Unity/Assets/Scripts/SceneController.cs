@@ -9,10 +9,7 @@ public class SceneController : MonoBehaviour {
     private static SceneController instance;
     public static SceneController Instance;
 
-    public Image fadePanel;
     public Image animtedTransitionPanel;
-    public Image switchProgress;
-    public TMP_Text switchText;
 
     private float switchCounter = 0;
     public float switchAfter = 55;
@@ -50,42 +47,20 @@ public class SceneController : MonoBehaviour {
         if (!switching) {
             switchCounter += Time.deltaTime;
             float fillAmount = flipProgressDir? (switchCounter / switchAfter) : 1 - (switchCounter / switchAfter);
-            switchProgress.fillAmount = fillAmount;
-            for (int i = 0; i < switchProgress.transform.childCount; i++) {
-                switchProgress.transform.GetChild(i).GetComponent<Image>().fillAmount = fillAmount;
+            for (int i = 1; i < transform.childCount; i++) {
+                transform.GetChild(i).GetComponent<Image>().fillAmount = fillAmount;
             }
-        }
-        if (switchCounter >= switchAfter - countDownStart) {
-            switchText.enabled = true;
-            switchText.text = $"Switching in {(int)(switchAfter-switchCounter) + 1}";
         }
         if (switchCounter >= switchAfter) {
             switchFunction();
         }
     }
 
-    void SwitchSceneFade() {
-        switchText.enabled = false;
-        switching = true;
-        currentSceneIndex++;
-        currentSceneIndex %= SceneManager.sceneCountInBuildSettings;
-        switchProgress.fillAmount = 0;
-        switchCounter = 0;
-        StartCoroutine(FadeToColor(0.5f, Color.white));
-        StartCoroutine(WaitFor(0.5f, () => { 
-            SceneManager.LoadScene(currentSceneIndex); 
-            StartCoroutine(FadeToColor(0.5f, new Color(1,1,1, 0)));
-            StartCoroutine(WaitFor(0.5f, () => switching = false));
-        }));
-    }
-
     void SwitchSceneCircles() {
-        switchText.enabled = false;
         switching = true;
         int oldSceneIndex = currentSceneIndex;
         currentSceneIndex++;
         currentSceneIndex %= SceneManager.sceneCountInBuildSettings;
-        switchProgress.fillAmount = 0;
         switchCounter = 0;
         animtedTransitionPanel.GetComponent<Animator>().SetBool("Activate", true);
         StartCoroutine(WaitFor(50f/60f, () => {
@@ -95,16 +70,6 @@ public class SceneController : MonoBehaviour {
                 animtedTransitionPanel.GetComponent<Animator>().SetBool("Activate", false);
             }));
         }));
-    }
-
-     IEnumerator FadeToColor(float time, Color newColor) {
-        float counter = 0;
-        Color startColor = fadePanel.color;
-        while (counter < time) {
-            counter += Time.deltaTime;
-            fadePanel.color = Color.Lerp(startColor, newColor, counter/time);
-            yield return null;
-        }
     }
 
     IEnumerator WaitFor(float time, Action postAction) {
