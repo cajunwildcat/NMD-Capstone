@@ -71,15 +71,20 @@ MonoBehaviour:
   min: {x: -10, y: -6}
   max: {x: 10, y: 6}
   switchXZ: 1
-  flipLong: 0
-  flipShort: 0
+  flipLong: 1
+  flipShort: 1
   trackerScale: 1
   kinectDepthCutOffs: {x: 1, y: 5}
+  maxTotalKinectDepth: 6
+  kinectXCutOff: 1
+  kinectXOffset:
+  - 0
+  - 0
   topLeft: {x: 0, y: 0}
   topRight: {x: 0, y: 0}
   bottomLeft: {x: 0, y: 0}
   bottomRight: {x: 0, y: 0}
-  trackedPeopleDisplayList: []
+  TrackedPeople: []
 --- !u!1 &4883124162228994939
 GameObject:
   m_ObjectHideFlags: 0

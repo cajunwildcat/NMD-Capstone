@@ -23,5 +23,23 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/RiveLexi.unity
     guid: 77290b8572ac0b845a4399914edc6b36
+  - enabled: 1
+    path: Assets/Scenes/RiveDiana2.unity
+    guid: 109e3b1fcc1142648aea1d5c1115a93c
+  - enabled: 1
+    path: Assets/Scenes/RiveMiles.unity
+    guid: 30ac078e1e3b6b8469dfbd4de4ecb43b
+  - enabled: 1
+    path: Assets/Scenes/RiveMonsters.unity
+    guid: adb2752d249dfc34baf782b4e6f984ac
+  - enabled: 1
+    path: Assets/Scenes/RivePools.unity
+    guid: 011b9c6b39eb6774b83cff3c1d890a23
+  - enabled: 1
+    path: Assets/Scenes/RiveStickers.unity
+    guid: 33488b90e3b2c5d429574293b1b5f84e
+  - enabled: 1
+    path: Assets/Scenes/RiveTriangles.unity
+    guid: 49e4ed40047c7a841ad0dda7714a9193
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

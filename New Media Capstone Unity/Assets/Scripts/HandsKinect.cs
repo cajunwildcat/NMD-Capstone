@@ -84,8 +84,11 @@ public class HandsKinect : MonoBehaviour {
     [SerializeField]
     TrackedPerson[] TrackedPeople;
 
+    [SerializeField]
     private bool canChangeGradient = true;
+    [SerializeField]
     private float gestureCooldown = 1.0f; // Cooldown period in seconds after a gesture is recognized
+    [SerializeField]
     private float lastGestureTime = -1.0f; // Time at which the last gesture was recognized
 
     [Serializable]
@@ -129,7 +132,6 @@ public class HandsKinect : MonoBehaviour {
 
         KinectTCPServer.NewExtraKinectDataEvent += () => {
             newExtraKinectData = true;
-            //Debug.Log("New Extra coords");
         };
     }
     bool newExtraKinectData = false;
@@ -303,7 +305,8 @@ public class HandsKinect : MonoBehaviour {
     }
 
     private void GradientChangeOnGesture(Body[] bodies) {
-        if (SceneManager.GetActiveScene().name == "Circles2") return;
+        //Debug.Log(SceneManager.GetActiveScene().name);
+        if (!(SceneManager.GetActiveScene().name == "Circles2")) return;
         if (!canChangeGradient && Time.time - lastGestureTime > gestureCooldown) {
             canChangeGradient = true;
         }

@@ -304,7 +304,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c3e2ebd19eeeb4b81ed510ea4ed506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gradients: []
+  gradients:
+  - {fileID: 6240809039665193743, guid: 5352c9509ccbb6a45ac76c4bba7b8635, type: 3}
+  - {fileID: 21300000, guid: abfc72ffc9a66714e9e0fe95e0d1a68a, type: 3}
+  - {fileID: 21300000, guid: f1520e3e85d8a364694f2dab9c096a89, type: 3}
 --- !u!1 &267502094
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,7 +641,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1876270241637645462, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
       propertyPath: switchAfter
-      value: 0
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 4771317797157875300, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
       propertyPath: m_Pivot.x
