@@ -37,7 +37,7 @@ class KinectBodyTracker {
         bodyFrameReader.FrameArrived += BodyFrameReader_FrameArrived;
 
         // Start asynchronous connection to TCP server
-        ConnectToServerAsync();
+        //ConnectToServerAsync();
 
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
@@ -65,7 +65,7 @@ class KinectBodyTracker {
                     }
                 }*/
 
-                if (isConnected && canSend) {
+                if (true) {
                     List<CustomBody> bodiesData = new List<CustomBody>();
                     for (int i = 0; i < bodies.Length; i++) {
                         if (!bodies[i].IsTracked) continue;
@@ -90,22 +90,22 @@ class KinectBodyTracker {
         Console.WriteLine($"{jointName}: X={joint.Position.X}, Y={joint.Position.Y}, Z={joint.Position.Z}".PadRight(Console.WindowWidth - 1)); // Pad to clear previous data
     }
 
-    private static async void ConnectToServerAsync() {
+    private static async void ConnectToServer() {
         isConnected = false;
         while (!isConnected) {
             try {
                 tcpClient = new TcpClient();
-                await tcpClient.ConnectAsync(IPAddress.Parse("192.168.0.103"), 12345); // Change IP and port as needed
+                await tcpClient.ConnectAsync(IPAddress.Parse("192.168.0.102"), 12345); // Change IP and port as needed
                 networkStream = tcpClient.GetStream();
                 isConnected = true;
                 canSend = true;
-                Console.WriteLine("Connected to TCP server.");
+                //Console.WriteLine("Connected to TCP server.");
             } catch (Exception ex) {
                 Console.WriteLine($"Error connecting to TCP server: {ex.Message}");
                 isConnected = false;
                 canSend = false;
-                // Retry after 10 seconds
-                await Task.Delay(500);
+                // Retry after .1 seconds
+                await Task.Delay(100);
             }
         }
     }
@@ -124,15 +124,14 @@ class KinectBodyTracker {
         }
 
         string data = JsonConvert.SerializeObject(joints);
-        Console.WriteLine(data + "                                           ");
+        //Console.WriteLine(data + "                                           ");
         byte[] bytesToSend = Encoding.ASCII.GetBytes(data);
         try {
-            networkStream.Write(bytesToSend, 0, data.Length);
+            networkStream.Write(bytesToSend, 0, bytesToSend.Length);
             networkStream.Flush();
             Console.WriteLine($"Sent joint data over TCP.");
         } catch (Exception ex) {
             Console.WriteLine($"Error sending joint data: {ex.Message}");
-            ConnectToServerAsync();
         }
 
         await Task.Delay(100);
@@ -140,6 +139,28 @@ class KinectBodyTracker {
     }
 
     private static async void SendJointDataOverTcp(CustomBody[] bodies) {
+        while (!isConnected)
+        {
+            try
+            {
+                tcpClient = new TcpClient();
+                await tcpClient.ConnectAsync(IPAddress.Parse("192.168.0.102"), 12345); // Change IP and port as needed
+                networkStream = tcpClient.GetStream();
+                isConnected = true;
+                canSend = true;
+                //Console.WriteLine("Connected to TCP server.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error connecting to TCP server: {ex.Message}");
+                isConnected = false;
+                canSend = false;
+                // Retry after .1 seconds
+                await Task.Delay(100);
+            }
+        }
+
+        
         canSend = false;
         for (int i = 0; i < bodies.Length; i++) {
             for (int j = 0; j < bodies[i].joints.Length; j++) {
@@ -149,19 +170,23 @@ class KinectBodyTracker {
             }
         }
 
-        string data = JsonConvert.SerializeObject(bodies);
-        Console.WriteLine(data + "                                           ");
-        byte[] bytesToSend = Encoding.ASCII.GetBytes(data);
-        try {
-            networkStream.Write(bytesToSend, 0, data.Length);
-            networkStream.Flush();
-            //Console.WriteLine($"Sent joint data over TCP.");
-        } catch (Exception ex) {
-            Console.WriteLine($"Error sending joint data: {ex.Message}");
-            ConnectToServerAsync();
-        }
+        string json = JsonConvert.SerializeObject(bodies);
+        byte[] data = Encoding.ASCII.GetBytes(json);
+        Console.SetCursorPosition(0, 0);
+        Console.WriteLine(data.Length);        
+        Console.WriteLine(json);
 
-        await Task.Delay(100);
-        canSend = true;
+        try
+        {
+            TcpClient client = new TcpClient("192.168.0.102", 12345);
+            NetworkStream stream = client.GetStream();
+
+            stream.Write(data, 0, data.Length);
+
+            client.Close();
+        } catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }
