@@ -95,7 +95,7 @@ class KinectBodyTracker {
         while (!isConnected) {
             try {
                 tcpClient = new TcpClient();
-                await tcpClient.ConnectAsync(IPAddress.Parse("127.0.0.1"), 12345); // Change IP and port as needed
+                await tcpClient.ConnectAsync(IPAddress.Parse("192.168.0.103"), 12345); // Change IP and port as needed
                 networkStream = tcpClient.GetStream();
                 isConnected = true;
                 canSend = true;
