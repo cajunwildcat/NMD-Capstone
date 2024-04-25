@@ -7,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using Joint = Windows.Kinect.Joint;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 public struct CustomBody {
     public Joint[] joints;
@@ -20,11 +21,13 @@ public class KinectTCPServer : MonoBehaviour {
     private static KinectTCPServer instance;
     public static KinectTCPServer Instance => instance;
 
-    private static TcpListener tcpListener;
+    private static TcpClient client;
 
     public static CustomBody[] ExtraKinectCoordinates;
 
-    bool acceptConnections = true;
+    private static bool shouldConnect = false;
+    private static float requestCounter = 0;
+    private static float requestCooldown = 0.01f;
 
     private void Awake() {
         if (instance) {
@@ -37,32 +40,74 @@ public class KinectTCPServer : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        tcpListener = new TcpListener(IPAddress.Any,12345); // Port number can be changed
-        tcpListener.Start();
-        ConnectWithClients();
+        shouldConnect = true;
+        //StartCoroutine(RequestData());
     }
 
-    private void OnDestroy() {
-        acceptConnections = false;
-        tcpListener.Stop();
+    void OnDestroy()
+    {
+        shouldConnect = false;
     }
-
-    async void ConnectWithClients() {
-        while (acceptConnections) {
-            try {
-                TcpClient client = await tcpListener.AcceptTcpClientAsync();
+    
+    void Update()
+    {
+        requestCounter += Time.deltaTime;
+        if (requestCounter >= requestCooldown) {
+            try
+            {
+                client = new TcpClient();
+                if (!client.ConnectAsync("192.168.0.101", 12345).Wait(8)) {
+                    //the server isn't running
+                    Debug.Log("The server isnt running, cannot get extra kinect data");
+                    return;
+                }
                 NetworkStream stream = client.GetStream();
 
                 int i = 0;
                 byte[] buffer = new byte[1024];
-                while ((i = stream.Read(buffer, 0, buffer.Length)) != 0) {
-                    string data = Encoding.ASCII.GetString(buffer, 0, i);
-                    ExtraKinectCoordinates = JsonConvert.DeserializeObject<CustomBody[]>(data);
+                while ((i = stream.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    string s = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
+                    Debug.Log(s);
+                    ExtraKinectCoordinates = JsonConvert.DeserializeObject<CustomBody[]>(s);
                     NewExtraKinectDataEvent?.Invoke();
                 }
-            } catch (Exception e) {
-                await Console.Out.WriteLineAsync($"Error connecting with/reading client data: {e.Message}");
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            requestCounter -= requestCooldown;
+        }
+    }
+
+    IEnumerator RequestData()
+    {
+        while (shouldConnect)
+        {
+            try
+            {
+                client = new TcpClient();
+                client.Connect("192.168.0.101", 12345);
+                NetworkStream stream = client.GetStream();
+
+                int i = 0;
+                byte[] buffer = new byte[1024];
+                while ((i = stream.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    string s = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
+                    //Debug.Log(s);
+                    ExtraKinectCoordinates = JsonConvert.DeserializeObject<CustomBody[]>(s);
+                    NewExtraKinectDataEvent?.Invoke();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }
