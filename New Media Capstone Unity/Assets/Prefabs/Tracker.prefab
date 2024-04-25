@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2864568145408029266}
-  - component: {fileID: 3440473548114280951}
   - component: {fileID: 2396664157955154754}
+  - component: {fileID: 1478529554224107265}
   m_Layer: 0
   m_Name: Tracker
   m_TagString: Untagged
@@ -34,26 +34,6 @@ Transform:
   - {fileID: 498675045902965313}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3440473548114280951
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4355210200482251874}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b14e5c3f19d2a4408acedb33d643bce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  peopleFollower: {fileID: 343499153897624774, guid: 25a08e54dd252864ba989671b154f03d, type: 3}
-  min: {x: -10, y: -6}
-  max: {x: 10, y: 6}
-  switchXZ: 1
-  flipLong: 1
-  flipShort: 0
-  trackerScale: 1
-  kinectDepthCutOffs: {x: 1, y: 5}
 --- !u!114 &2396664157955154754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,6 +65,21 @@ MonoBehaviour:
   bottomLeft: {x: 0, y: 0}
   bottomRight: {x: 0, y: 0}
   TrackedPeople: []
+  canChangeGradient: 1
+  gestureCooldown: 1
+  lastGestureTime: -1
+--- !u!114 &1478529554224107265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4355210200482251874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 353c1d45ccf9118448472354be6188e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4883124162228994939
 GameObject:
   m_ObjectHideFlags: 0
