@@ -43,6 +43,10 @@ public class SceneController : MonoBehaviour {
     }
 
     private void Update() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            switchFunction();
+        }
+        if (switchAfter == 0) return;
         if (!switching) {
             switchCounter += Time.deltaTime;
             float fillAmount = flipProgressDir? (switchCounter / switchAfter) : 1 - (switchCounter / switchAfter);
@@ -56,9 +60,6 @@ public class SceneController : MonoBehaviour {
             switchText.text = $"Switching in {(int)(switchAfter-switchCounter) + 1}";
         }
         if (switchCounter >= switchAfter) {
-            switchFunction();
-        }
-        if (Input.GetKeyDown(KeyCode.Space)) {
             switchFunction();
         }
     }

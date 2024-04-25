@@ -54,8 +54,8 @@ class KinectBodyTracker {
                 Body[] bodies = new Body[kinectSensor.BodyFrameSource.BodyCount];
                 bodyFrame.GetAndRefreshBodyData(bodies);
 
-                /*foreach (Body body in bodies) {
-                    if (body.IsTracked) {                        
+                foreach (Body body in bodies) {
+                    if (body.IsTracked) {
                         // Output only SpineMid, HandLeft, and HandRight joint data
                         Console.SetCursorPosition(0, 0); // Move cursor up 5 lines
                         Console.WriteLine($"Body ID: {body.TrackingId}");
@@ -63,7 +63,7 @@ class KinectBodyTracker {
                         PrintJointData(body.Joints[JointType.HandLeft], "HandLeft");
                         PrintJointData(body.Joints[JointType.HandRight], "HandRight");
                     }
-                }*/
+                }
 
                 if (true) {
                     List<CustomBody> bodiesData = new List<CustomBody>();

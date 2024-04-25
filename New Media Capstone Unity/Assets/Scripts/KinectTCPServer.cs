@@ -13,18 +13,18 @@ public struct CustomBody {
     public ulong TrackingId;
 }
 
+public delegate void NewExtraKinectData();
+
 public class KinectTCPServer : MonoBehaviour {
+    public static event NewExtraKinectData NewExtraKinectDataEvent;
     private static KinectTCPServer instance;
-    public static KinectTCPServer Instance;
+    public static KinectTCPServer Instance => instance;
 
     private static TcpListener tcpListener;
 
-    private static TcpClient client;
-    private static NetworkStream stream;
-    private static byte[] receiveBuffer = new byte[1024];
+    public static CustomBody[] ExtraKinectCoordinates;
 
-    public static List<CustomBody> ExtraKinectCoordinates = new List<CustomBody>();
-    
+    bool acceptConnections = true;
 
     private void Awake() {
         if (instance) {
@@ -37,78 +37,32 @@ public class KinectTCPServer : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        StartServer();
-        Debug.Log("TCP server started. Press any key to exit.");
-        Console.ReadKey();
-        //tcpListener.Stop();
-    }
-
-    // Update is called once per frame
-    void Update() {
-
+        tcpListener = new TcpListener(IPAddress.Any,12345); // Port number can be changed
+        tcpListener.Start();
+        ConnectWithClients();
     }
 
     private void OnDestroy() {
+        acceptConnections = false;
         tcpListener.Stop();
     }
 
-    private static async void StartServer() {
-        try {
-            tcpListener = new TcpListener(IPAddress.Any,12345); // Port number can be changed
-            tcpListener.Start();
+    async void ConnectWithClients() {
+        while (acceptConnections) {
+            try {
+                TcpClient client = await tcpListener.AcceptTcpClientAsync();
+                NetworkStream stream = client.GetStream();
 
-            while (true) {
-                client = await tcpListener.AcceptTcpClientAsync();
-                Debug.Log("Client connected.");
-                stream = client.GetStream();
-
-                stream.BeginRead(receiveBuffer, 0, receiveBuffer.Length, HandleClient, null);
-            }
-        } catch (Exception ex) {
-            Debug.Log($"Error starting server: {ex.Message}");
-        }
-    }
-
-    private static void HandleClient(IAsyncResult result) {
-        try {
-            int bytesRead = stream.EndRead(result);
-            if (bytesRead > 0) {
-                // Convert the received bytes to a string
-                string data = Encoding.ASCII.GetString(receiveBuffer, 0, bytesRead);
-                Debug.Log(data);
-                CustomBody[] joints = JsonConvert.DeserializeObject<CustomBody[]>(data);
-                PrintReceivedData(joints);
-            }
-
-            // Continue receiving data asynchronously
-            stream.BeginRead(receiveBuffer, 0, receiveBuffer.Length, HandleClient, null);
-        } catch (Exception e) {
-            Debug.Log(e.Message);
-            StartServer();
-        }
-    }
-
-    private static void PrintReceivedData(Joint[] joints) {
-        if (joints != null && joints.Length == 3) {
-            foreach (Joint joint in joints) {
-                Debug.Log($"Received joint data: Type={joint.JointType}, X={joint.Position.X}, Y={joint.Position.Y}, Z={joint.Position.Z}");
-            }
-        }
-        else {
-            Debug.Log("Received invalid joint data.");
-        }
-    }
-
-    private static void PrintReceivedData(CustomBody[] bodies) {
-        if (bodies != null && bodies.Length == 3) {
-            foreach (CustomBody b in bodies) {
-                foreach (Joint joint in b.joints) {
-                    Debug.Log($"Received joint data for body {b.TrackingId}: Type={joint.JointType}, X={joint.Position.X}, Y={joint.Position.Y}, Z={joint.Position.Z}");
+                int i = 0;
+                byte[] buffer = new byte[1024];
+                while ((i = stream.Read(buffer, 0, buffer.Length)) != 0) {
+                    string data = Encoding.ASCII.GetString(buffer, 0, i);
+                    ExtraKinectCoordinates = JsonConvert.DeserializeObject<CustomBody[]>(data);
+                    NewExtraKinectDataEvent?.Invoke();
                 }
+            } catch (Exception e) {
+                await Console.Out.WriteLineAsync($"Error connecting with/reading client data: {e.Message}");
             }
-        }
-        else {
-            Debug.Log("Received invalid joint data.");
         }
     }
 }
