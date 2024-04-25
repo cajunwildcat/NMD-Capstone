@@ -22,7 +22,7 @@ public class PathDrawer : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        List<GameObject> trackers = KinectCoordinates.Instance.GetAllTrackerObjects();
+        List<GameObject> trackers = HandsKinect.Instance.GetAllTrackerGameObjects();
         foreach (GameObject tracker in trackers) {
             Vector3 pos = tracker.transform.position;
             if (!colors.ContainsKey(tracker)) {

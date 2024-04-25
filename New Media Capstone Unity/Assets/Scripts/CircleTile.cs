@@ -28,14 +28,13 @@ public class CircleTile : MonoBehaviour {
         if (animating && sm.sprite != sr.sprite) {
             sm.sprite = sr.sprite;
         }
-        RaycastHit2D hit = Physics2D.CircleCast(transform.position, collider.radius * transform.localScale.x, Vector2.zero, 0, searcherLayer);
-        if (!activated && hit) {
-            Activate();
+
+        if (activated) {
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, collider.radius * transform.localScale.x, Vector2.zero, 0, searcherLayer);
+            if (!hit) {
+                StartCoroutine(TimeOut(3f));
+            }
         }
-        if (activated && !hit && prevHit) {
-            StartCoroutine(TimeOut(3f));
-        }
-        prevHit = hit;
     }
 
     IEnumerator TimeOut(float t) {

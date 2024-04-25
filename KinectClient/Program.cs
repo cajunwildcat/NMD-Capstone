@@ -54,8 +54,8 @@ class KinectBodyTracker {
                 Body[] bodies = new Body[kinectSensor.BodyFrameSource.BodyCount];
                 bodyFrame.GetAndRefreshBodyData(bodies);
 
-                /*foreach (Body body in bodies) {
-                    if (body.IsTracked) {                        
+                foreach (Body body in bodies) {
+                    if (body.IsTracked) {
                         // Output only SpineMid, HandLeft, and HandRight joint data
                         Console.SetCursorPosition(0, 0); // Move cursor up 5 lines
                         Console.WriteLine($"Body ID: {body.TrackingId}");
@@ -63,7 +63,7 @@ class KinectBodyTracker {
                         PrintJointData(body.Joints[JointType.HandLeft], "HandLeft");
                         PrintJointData(body.Joints[JointType.HandRight], "HandRight");
                     }
-                }*/
+                }
 
                 if (isConnected && canSend) {
                     List<CustomBody> bodiesData = new List<CustomBody>();
@@ -95,7 +95,7 @@ class KinectBodyTracker {
         while (!isConnected) {
             try {
                 tcpClient = new TcpClient();
-                await tcpClient.ConnectAsync(IPAddress.Parse("192.168.0.103"), 12345); // Change IP and port as needed
+                await tcpClient.ConnectAsync(IPAddress.Parse("192.168.0.101"), 12345); // Change IP and port as needed
                 networkStream = tcpClient.GetStream();
                 isConnected = true;
                 canSend = true;

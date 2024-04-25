@@ -6,7 +6,6 @@ using Windows.Kinect;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using Joint = Windows.Kinect.Joint;
-using TreeEditor;
 
 [Serializable]
 public struct TrackedPersonData {
@@ -60,7 +59,9 @@ public class HandsKinect : MonoBehaviour {
     public bool flipShort = false;
     public float trackerScale = 1f;
     public Vector2 kinectDepthCutOffs = new Vector2(0.5f, 4.5f);
+    public float maxTotalKinectDepth = 6;
     public float kinectXCutOff = 1f;
+    [SerializeField]
     float[] kinectXOffset = new float[2] { 0f, 0f };
     Bounds KinectSpaceBounds {
         get {
@@ -68,24 +69,26 @@ public class HandsKinect : MonoBehaviour {
         }
     }
 
-    bool[] setNextZero = new bool[2] { false, false };
+    bool[] setNextXZero = new bool[2] { false, false };
     bool[] setNextDepthMin = new bool[2] { false, false };
     bool[] setNextDepthMax = new bool[2] { false, false };
 
     // New variables for the corners of the depth recognition area
     public Vector2 topLeft, topRight, bottomLeft, bottomRight;
 
-    [SerializeField]
     private List<TrackedPersonData> trackedPeopleDisplayList = new List<TrackedPersonData>();
 
     // Define a dictionary to keep track of the GameObjects associated with each TrackingId
     //Dictionary<ulong, TrackedPerson> trackedPeople = new Dictionary<ulong, TrackedPerson>();
     List<TrackedPerson> trackedPeople = new List<TrackedPerson>();
+    [SerializeField]
+    TrackedPerson[] TrackedPeople;
 
     private bool canChangeGradient = true;
     private float gestureCooldown = 1.0f; // Cooldown period in seconds after a gesture is recognized
     private float lastGestureTime = -1.0f; // Time at which the last gesture was recognized
 
+    [Serializable]
     public class TrackedPerson {
         public ulong trackingId;
 
@@ -123,7 +126,13 @@ public class HandsKinect : MonoBehaviour {
             min.y = max.y;
             max.y = temp;
         }
+
+        KinectTCPServer.NewExtraKinectDataEvent += () => {
+            newExtraKinectData = true;
+            //Debug.Log("New Extra coords");
+        };
     }
+    bool newExtraKinectData = false;
 
     //sensor must be unsubscribed from to close the scene / stop the play
     void OnDestroy() {
@@ -131,8 +140,9 @@ public class HandsKinect : MonoBehaviour {
     }
     //update user position
     private void Update() {
+        TrackedPeople = trackedPeople.ToArray();
         transform.position = Vector3.zero;
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.Return)) {
             SetXZero();
         }
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
@@ -141,10 +151,14 @@ public class HandsKinect : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
             SetKinectMax();
         }
-
         // Calculate and update the corners of the depth recognition area
         CalculateDepthCorners();
-        
+
+        if (newExtraKinectData) {
+            BodyFrameArrived(KinectTCPServer.ExtraKinectCoordinates);
+            newExtraKinectData = false;
+        }
+        //update time for trackers and remove them if they have been around for too long without updates
         for (int i = 0; i < trackedPeople.Count; i++) {
             if (trackedPeople[i].trackingId < (ulong)trackedPeople.Count) continue;
             trackedPeople[i].timeSinceLastUpdate += Time.deltaTime;
@@ -157,7 +171,7 @@ public class HandsKinect : MonoBehaviour {
     }
 
     private void SetXZero() {
-        setNextZero = new bool[2] { true, true };
+        setNextXZero = new bool[2] { true, true };
     }
 
     private void SetKinectMin() {
@@ -190,8 +204,9 @@ public class HandsKinect : MonoBehaviour {
             // Iterate through each body
             foreach (var body in bodies.Where((b)=>b.IsTracked)) {
                 CameraSpacePoint pos = body.Joints[JointType.SpineMid].Position;
-                if (setNextZero[0]) {
+                if (setNextXZero[0]) {
                     kinectXOffset[0] = -pos.X;
+                    setNextXZero[0] = false;
                 }
                 if (!KinectSpaceBounds.Contains(new(pos.X + kinectXOffset[0], pos.Z))) continue;
 
@@ -202,7 +217,7 @@ public class HandsKinect : MonoBehaviour {
                     AddNewTrackedPerson(trackingId);
                 }
                 var person = GetTrackerById(trackingId);
-                UpdateTrackedPerson(person, body);
+                UpdateTrackedPerson(person, body,0);
             }
         }
     }
@@ -211,6 +226,11 @@ public class HandsKinect : MonoBehaviour {
         // Iterate through each body
         foreach (var body in bodies) {
             CameraSpacePoint pos = body.joints[0].Position;
+            pos.X *= -1;
+            if (setNextXZero[1]) {
+                kinectXOffset[1] = -pos.X;
+                setNextXZero[1] = false;
+            }
             if (!KinectSpaceBounds.Contains(new(pos.X + kinectXOffset[1], pos.Z))) continue;
 
             ulong trackingId = body.TrackingId;
@@ -220,9 +240,10 @@ public class HandsKinect : MonoBehaviour {
                 AddNewTrackedPerson(trackingId);
             }
             var person = GetTrackerById(trackingId);
-            UpdateTrackerPosition(body.joints[0], person.bodyObject);
-            UpdateTrackerPosition(body.joints[1], person.rightHandObject);
-            UpdateTrackerPosition(body.joints[2], person.leftHandObject);
+            UpdateTrackerPosition(body.joints[0], person.bodyObject,1);
+            UpdateTrackerPosition(body.joints[1], person.rightHandObject,1);
+            UpdateTrackerPosition(body.joints[2], person.leftHandObject,1);
+            person.timeSinceLastUpdate = 0;
         }
     }
 
@@ -241,17 +262,20 @@ public class HandsKinect : MonoBehaviour {
         trackedPeople.Add(newPerson);
     }
 
-    private void UpdateTrackedPerson(TrackedPerson p, Body b) {
-        UpdateTrackerPosition(b.Joints[JointType.SpineMid], p.bodyObject);
-        UpdateTrackerPosition(b.Joints[JointType.HandLeft], p.leftHandObject);
-        UpdateTrackerPosition(b.Joints[JointType.HandRight], p.rightHandObject);
+    private void UpdateTrackedPerson(TrackedPerson p, Body b, int kinectIndex) {
+        UpdateTrackerPosition(b.Joints[JointType.SpineMid], p.bodyObject, kinectIndex);
+        UpdateTrackerPosition(b.Joints[JointType.HandLeft], p.leftHandObject, kinectIndex);
+        UpdateTrackerPosition(b.Joints[JointType.HandRight], p.rightHandObject, kinectIndex);
         p.timeSinceLastUpdate = 0;
     }
 
-    private void UpdateTrackerPosition(Joint joint, GameObject trackerObject) {
+    private void UpdateTrackerPosition(Joint joint, GameObject trackerObject, int kinectIndex) {
         CameraSpacePoint position = joint.Position;
 
-        position.X += kinectXOffset[0];
+        position.X += kinectXOffset[kinectIndex];
+        if (kinectIndex == 1) {
+            position.X *= -1;
+        }
 
         float x, y;
         if (switchXZ) {
@@ -259,18 +283,20 @@ public class HandsKinect : MonoBehaviour {
             float l = position.Z;
             // Ensure l is within the bounds of kinectDepthCutOffs before normalization
             float t = (l <= kinectDepthCutOffs.x) ? 0 :
-                      (l >= kinectDepthCutOffs.y) ? 1 :
-                      (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
-            x = Mathf.Lerp(min.x, max.x, t);
+                      (l >= maxTotalKinectDepth) ? 1 :
+                      (l - kinectDepthCutOffs.x) / (maxTotalKinectDepth - kinectDepthCutOffs.x);
+            if (kinectIndex == 0) x = Mathf.Lerp(min.x, max.x, t);
+            else x = Mathf.Lerp(max.x, min.x, t);
         }
         else {
             x = Mathf.Lerp(min.x, max.x, (position.X + 1) / 2);
             float l = position.Z;
             // Normalization with respect to Z depth
             float t = (l <= kinectDepthCutOffs.x) ? 0 :
-                      (l >= kinectDepthCutOffs.y) ? 1 :
-                      (l - kinectDepthCutOffs.x) / (kinectDepthCutOffs.y - kinectDepthCutOffs.x);
-            y = Mathf.Lerp(min.y, max.y, t);
+                      (l >= maxTotalKinectDepth) ? 1 :
+                      (l - kinectDepthCutOffs.x) / (maxTotalKinectDepth - kinectDepthCutOffs.x);
+            if (kinectIndex == 0) y = Mathf.Lerp(min.y, max.y, t);
+            else y = Mathf.Lerp(max.y, min.y, t);
         }
 
         trackerObject.transform.position = new Vector3(x, y, 0);
@@ -323,6 +349,14 @@ public class HandsKinect : MonoBehaviour {
             positions.Add(p.bodyObject.transform.position);
         }
         return positions;
+    }
+
+    public List<GameObject> GetAllTrackerGameObjects() {
+        List<GameObject> objects = new List<GameObject>();
+        foreach (TrackedPerson p in trackedPeople) {
+            objects.Add(p.bodyObject);
+        }
+        return objects;
     }
     #endregion
 
