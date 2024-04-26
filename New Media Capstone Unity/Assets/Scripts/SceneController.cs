@@ -10,6 +10,7 @@ public class SceneController : MonoBehaviour {
     public static SceneController Instance;
 
     public Image animtedTransitionPanel;
+    public AudioSource transitionSound;  // Reference to the AudioSource for the transition sound
 
     private float switchCounter = 0;
     public float switchAfter = 55;
@@ -63,6 +64,7 @@ public class SceneController : MonoBehaviour {
         currentSceneIndex %= SceneManager.sceneCountInBuildSettings;
         switchCounter = 0;
         animtedTransitionPanel.GetComponent<Animator>().SetBool("Activate", true);
+        transitionSound.Play();  // Play the transition sound
         StartCoroutine(WaitFor(50f/60f, () => {
             SceneManager.LoadSceneAsync(currentSceneIndex);
             StartCoroutine(WaitFor((144f-50f)/60f, () => { 
