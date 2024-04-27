@@ -417,10 +417,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SceneCotroller
       objectReference: {fileID: 0}
-    - target: {fileID: 1876270241637645462, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
-      propertyPath: switchAfter
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4771317797157875300, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
       propertyPath: m_Pivot.x
       value: 0

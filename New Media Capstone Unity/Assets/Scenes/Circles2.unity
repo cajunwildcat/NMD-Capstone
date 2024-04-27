@@ -134,10 +134,10 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 82c995814fecc3740a4586baca0aa2f0, type: 3}
-  m_Resource: {fileID: 8300000, guid: 82c995814fecc3740a4586baca0aa2f0, type: 3}
+  m_audioClip: {fileID: 8300000, guid: baadb08dc53680746b90c526cf0de9f5, type: 3}
+  m_Resource: {fileID: 8300000, guid: baadb08dc53680746b90c526cf0de9f5, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.54
+  m_Volume: 0.528
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -553,7 +553,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: fdd1366fcdff5cc418f01c040bec3857, type: 3}
   m_Resource: {fileID: 8300000, guid: fdd1366fcdff5cc418f01c040bec3857, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.205
+  m_Volume: 0.066
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -923,7 +923,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: kinectDepthCutOffs.x
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: 'hexColors.Array.data[0]'

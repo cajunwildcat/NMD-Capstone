@@ -23,7 +23,7 @@ public class SceneController : MonoBehaviour {
 
     private void Awake() {
         if (instance) {
-            //instance.switchAfter = switchAfter;
+            instance.switchAfter = switchAfter;
             Destroy(gameObject);
         }
         else {

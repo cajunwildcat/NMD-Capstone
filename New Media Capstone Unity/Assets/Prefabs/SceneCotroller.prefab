@@ -55,11 +55,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79aa56b51b02a8c4285375fad3c6ed9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadePanel: {fileID: 0}
   animtedTransitionPanel: {fileID: 4633099804724506400}
-  switchProgress: {fileID: 960301358446829276}
-  switchText: {fileID: 0}
-  switchAfter: 15
+  transitionSound: {fileID: 0}
+  switchAfter: 45
   flipProgressDir: 1
 --- !u!223 &6338543351261741958
 Canvas:
