@@ -129,6 +129,13 @@ public class HandsKinect : MonoBehaviour {
             min.y = max.y;
             max.y = temp;
         }
+        foreach (var hex in hexColors)
+        {
+            if (ColorUtility.TryParseHtmlString(hex, out Color newColor))
+            {
+                colors.Add(newColor);
+            }
+        }
 
         KinectTCPServer.NewExtraKinectDataEvent += () => {
             newExtraKinectData = true;
@@ -306,7 +313,7 @@ public class HandsKinect : MonoBehaviour {
 
     private void GradientChangeOnGesture(Body[] bodies) {
         //Debug.Log(SceneManager.GetActiveScene().name);
-        if (!(SceneManager.GetActiveScene().name == "Circles2")) return;
+        if (!(SceneManager.GetActiveScene().name == "Circles2" || SceneManager.GetActiveScene().name == "Columns")) return;
         if (!canChangeGradient && Time.time - lastGestureTime > gestureCooldown) {
             canChangeGradient = true;
         }
@@ -319,13 +326,41 @@ public class HandsKinect : MonoBehaviour {
 
                 // Ensure we can change the gradient and the gesture is detected
                 if (canChangeGradient && leftHandPosition.Y > headPosition.Y && rightHandPosition.Y > headPosition.Y) {
-                    FindFirstObjectByType<GradientChanger>().CycleGradient();
-                    lastGestureTime = Time.time; // Record the time of the gesture
-                    canChangeGradient = false; // Reset the flag to enter cooldown
-                    break; // Exit the loop after handling the gesture
+                    if(SceneManager.GetActiveScene().name == "Circles2")
+                    {
+                        FindFirstObjectByType<GradientChanger>().CycleGradient();
+                        lastGestureTime = Time.time; // Record the time of the gesture
+                        canChangeGradient = false; // Reset the flag to enter cooldown
+                        break; // Exit the loop after handling the gesture
+                    }
+                    else
+                    {
+                        ChangeAmbientColor();
+                        lastGestureTime = Time.time; // Record the time of the gesture
+                        canChangeGradient = false; // Reset the flag to enter cooldown
+                        break; // Exit the loop after handling the gesture
+                    }
+
                 }
             }
         }
+    }
+    [SerializeField]
+    private List<string> hexColors = new List<string> {
+        "#FF0000", // Red
+        "#00FF00", // Green
+        "#0000FF", // Blue
+        "#FFFF00", // Yellow
+        "#FF00FF"  // Magenta
+    };
+
+    private List<Color> colors = new List<Color>();
+    private int currentIndex = 0;
+    private void ChangeAmbientColor()
+    {
+        // Change the ambient light color
+        RenderSettings.ambientLight = colors[currentIndex];
+        currentIndex = (currentIndex + 1) % colors.Count; // Cycle through the list
     }
 
     #region Helper Functions To Get Positions
