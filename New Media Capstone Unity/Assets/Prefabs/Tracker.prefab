@@ -54,12 +54,12 @@ MonoBehaviour:
   flipLong: 1
   flipShort: 1
   trackerScale: 1
-  kinectDepthCutOffs: {x: 1, y: 5}
-  maxTotalKinectDepth: 6
-  kinectXCutOff: 1
+  kinectDepthCutOffs: {x: 1, y: 5.2}
+  maxTotalKinectDepth: 5.22
+  kinectXCutOff: 1.2
   kinectXOffset:
-  - 0
-  - 0
+  - -0.39
+  - 0.11
   topLeft: {x: 0, y: 0}
   topRight: {x: 0, y: 0}
   bottomLeft: {x: 0, y: 0}
@@ -68,6 +68,12 @@ MonoBehaviour:
   canChangeGradient: 1
   gestureCooldown: 1
   lastGestureTime: -1
+  hexColors:
+  - '#FF0000'
+  - '#00FF00'
+  - '#0000FF'
+  - '#FFFF00'
+  - '#FF00FF'
 --- !u!114 &1478529554224107265
 MonoBehaviour:
   m_ObjectHideFlags: 0

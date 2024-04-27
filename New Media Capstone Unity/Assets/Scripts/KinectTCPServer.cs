@@ -56,7 +56,7 @@ public class KinectTCPServer : MonoBehaviour {
             try
             {
                 client = new TcpClient();
-                if (!client.ConnectAsync("192.168.0.101", 12345).Wait(8)) {
+                if (!client.ConnectAsync("192.168.0.103", 12345).Wait(8)) {
                     //the server isn't running
                     Debug.LogWarning("The server isnt running, cannot get extra kinect data");
                     return;

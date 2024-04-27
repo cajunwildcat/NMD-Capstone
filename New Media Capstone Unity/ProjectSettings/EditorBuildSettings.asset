@@ -5,44 +5,47 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Circles2.unity
     guid: faca9b920862c66409aa024739bbfeff
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveLexiLemons.unity
     guid: 9b49dfec3017ce64bbcada20c5571179
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveDiana.unity
     guid: 6fca5b91496007e409b402835142bfc8
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveDragon.unity
     guid: 8ff336becd712f849835a197200ddd1a
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveLexiLadders.unity
     guid: 77290b8572ac0b845a4399914edc6b36
   - enabled: 1
     path: Assets/Scenes/Columns.unity
     guid: 6825e859e17a5ec40a3352992a1f3f92
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveDiana2.unity
     guid: 109e3b1fcc1142648aea1d5c1115a93c
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveMiles.unity
     guid: 30ac078e1e3b6b8469dfbd4de4ecb43b
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveMonsters.unity
     guid: adb2752d249dfc34baf782b4e6f984ac
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Drawing.unity
     guid: 8977e6a502b26bd4db4925af5d44790d
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RivePools.unity
     guid: 011b9c6b39eb6774b83cff3c1d890a23
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveStickers.unity
     guid: 33488b90e3b2c5d429574293b1b5f84e
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/RiveTriangles.unity
     guid: 49e4ed40047c7a841ad0dda7714a9193
+  - enabled: 0
+    path: Assets/Scenes/Calibration.unity
+    guid: 35e23cd224057304fb5439220c67027b
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

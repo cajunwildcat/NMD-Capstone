@@ -265,6 +265,15 @@ public class HandsKinect : MonoBehaviour {
         };
 
         newPerson.bodyObject.transform.localScale = Vector3.one * trackerScale;
+
+        if (SceneManager.GetActiveScene().name == "Calibration")
+        {
+            SpriteRenderer sr = newPerson.bodyObject.GetComponent<SpriteRenderer>();
+            Color c = sr.color;
+            c.a = 0.5f;
+            sr.color = c;
+        }
+
         DontDestroyOnLoad(newPerson.bodyObject);
         newPerson.leftHandObject.transform.SetParent(newPerson.bodyObject.transform);
         newPerson.rightHandObject.transform.SetParent(newPerson.bodyObject.transform);
