@@ -514,7 +514,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: affa055b54e4f9e49a0fccc555106c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  asset: {fileID: -4516626237390682484, guid: 072fe8232394c6346ad57eff76a84399, type: 3}
+  asset: {fileID: -4516626237390682484, guid: d3db28a5ead48a742a8cc4078746bf3a, type: 3}
   fit: 1
   size: 2048
 --- !u!23 &1376970687

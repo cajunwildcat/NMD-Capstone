@@ -336,6 +336,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: maxTotalKinectDepth
+      value: 5.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: kinectDepthCutOffs.y
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 2864568145408029266, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -408,6 +416,10 @@ PrefabInstance:
     - target: {fileID: 665177393004177567, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
       propertyPath: m_Name
       value: SceneCotroller
+      objectReference: {fileID: 0}
+    - target: {fileID: 1876270241637645462, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
+      propertyPath: switchAfter
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4771317797157875300, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
       propertyPath: m_Pivot.x

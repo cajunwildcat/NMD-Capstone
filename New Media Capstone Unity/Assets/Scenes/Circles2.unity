@@ -630,6 +630,10 @@ PrefabInstance:
       propertyPath: m_FillAmount
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1876270241637645462, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
+      propertyPath: switchAfter
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1905492602761200830, guid: e89515aa0caacfc4bb03f1cbccbae7cb, type: 3}
       propertyPath: m_FillAmount
       value: 0
@@ -754,6 +758,10 @@ PrefabInstance:
     - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: maxTotalKinectDepth
       value: 5.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
+      propertyPath: kinectDepthCutOffs.y
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2396664157955154754, guid: d7e719af1af90034b8e1f3b419c25e63, type: 3}
       propertyPath: 'gradientObjects.Array.data[0]'

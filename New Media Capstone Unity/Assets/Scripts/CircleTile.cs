@@ -32,7 +32,7 @@ public class CircleTile : MonoBehaviour {
         if (activated) {
             RaycastHit2D hit = Physics2D.CircleCast(transform.position, collider.radius * transform.localScale.x, Vector2.zero, 0, searcherLayer);
             if (!hit) {
-                StartCoroutine(TimeOut(3f));
+                StartCoroutine(TimeOut(2f));
             }
         }
     }
