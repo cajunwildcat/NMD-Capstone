@@ -12,8 +12,9 @@ The scenes will appear and have various animations depending on the Rive animati
 - Appropriate adapter for the Xbox One Kinect, HDMI cables for connectivity
 - At least 1080p monitor display from the PCs
 - Two Laptops or PCs to host Unity scene (as long as they run Windows OS)
-- Open Space of at least 15 x 15 feet for the projection.
+- Open Space of at least 15 x 15 feet for the space. (Projection may be a lesser area)
 - Black curtains for environmental effect
+- Lights off
 
 # Tech
 
